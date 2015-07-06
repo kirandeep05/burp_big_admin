@@ -243,7 +243,7 @@
                             <a href="create_restaurant.php"><i class="fa fa-table fa-fw"></i> Create Restaurant</a>
                         </li>
                         <li>
-                            <a href="forms.html"><i class="fa fa-table fa-fw"></i> Edit Restaurant</a>
+                            <a href="edit_restaurant.php"><i class="fa fa-table fa-fw"></i> Edit Restaurant</a>
                         </li>                        
                     </ul>
                 </div>

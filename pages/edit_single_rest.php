@@ -35,7 +35,7 @@ if(isset($_POST['form_submit'])) {
     $buffet_menu = $_FILES['buffet_menu'];
     $bar_menu = $_FILES['bar_menu'];
     $banquet_images = $_FILES['banquet_image'];
-    $gallery_images = $_FILES['gallery'];
+    
     
     $field_id[] = "2";
     $field_id[] = "3";
@@ -126,18 +126,6 @@ if(isset($_POST['form_submit'])) {
                     }
                 }
                 
-                for($j=0;$j<count($gallery_images['name']);$j++) {
-                    $gallery_file['name'] = $gallery_images['name'][$j];
-                    $gallery_file['type'] = $gallery_images['type'][$j];
-                    $gallery_file['tmp_name'] = $gallery_images['tmp_name'][$j];
-                    $gallery_file['error'] = $gallery_images['error'][$j];
-                    $gallery_file['size'] = $gallery_images['size'][$j];
-                    $image_path = $adminObj->uploadFile($gallery_file, "gallery");
-                    if($image_path != "-1") {
-                        $adminObj->insertGallery($image_path, $hotel_id);
-                    }
-                }
-                
                 if($banquet == "Yes") {
                     for($j=0;$j<count($banquet_images['name']);$j++) {
                         $banquet_file['name'] = $banquet_images['name'][$j];
@@ -195,6 +183,101 @@ if(isset($_POST['form_submit'])) {
     }
 }
 
+$hotel_id = isset($_GET['hotel_id'])?$_GET['hotel_id']:"-1";
+$rest_name_arr = $adminObj->getRestaurantName($hotel_id);
+$hotel_name = $rest_name_arr['hotel_name'];
+$rest_name = $rest_name_arr['rest_name'];
+$details = $adminObj->getHotelDetails($hotel_id);
+$dhaba_checked = $rest_checked = $cafe_checked = $veg_checked = $nonveg_checked = $alcohol_yes = $alcohol_no = $dine_checked = $roof_checked = $lounge_checked = $bar_checked = $outdoor_checked = $alacarte_check = $buffet_check = $al_bf_check = $al_lunch_check = $al_dinner_check = $buffet_bf_check = $buffet_lunch_check = $buffet_dinner_check = $banquet_yes_check = $banquet_no_check = "";
+foreach($details as $detail) {
+    if($detail['hotel_field_id'] == 2) {
+        $rest_desc = $detail['hotel_field_val'];
+    } else if($detail['hotel_field_id'] == 3) {
+        $type = $detail['hotel_field_val'];
+        if($type == "Dhaba") {
+            $dhaba_checked = "checked";
+        } else if($type == "Restaurant") {
+            $rest_checked = "checked";
+        } else if($type == "Cafe") {
+            $cafe_checked = "checked";
+        }
+    } else if($detail['hotel_field_id'] == 4) {
+        $address = $detail['hotel_field_val'];
+    } else if($detail['hotel_field_id'] == 5) {
+        $area = $detail['hotel_field_val'];
+    } else if($detail['hotel_field_id'] == 6) {
+        
+    } else if($detail['hotel_field_id'] == 7) {
+        
+    } else if($detail['hotel_field_id'] == 8) {
+        
+    } else if($detail['hotel_field_id'] == 9) {
+        $main_phone = $detail['hotel_field_val'];
+    } else if($detail['hotel_field_id'] == 10) {
+        $alt_phone = $detail['hotel_field_val'];
+    } else if($detail['hotel_field_id'] == 11) {
+        $serves_arr = explode(",",$detail['hotel_field_val']);
+        foreach ($serves_arr as $serves) {
+            if($serves == "Veg") {
+                $veg_checked = "checked";
+            } else {
+                $nonveg_checked = "checked";
+            }
+        }
+    } else if($detail['hotel_field_id'] == 12) {
+        $alcohol = $detail['hotel_field_val'];
+        if($alcohol == "yes") {
+            $alcohol_yes = "checked";
+        } else {
+            $alcohol_no = "checked";
+        }
+    } else if($detail['hotel_field_id'] == 13) {
+        $seating_arr = explode(",",$detail['hotel_field_val']);
+        foreach($seating_arr as $seating) {
+            if($seating == "Dining") {
+                $dine_checked = "checked";
+            } else if($seating == "Roof") {
+                $roof_checked = "checked";
+            } else if($seating == "Outdoor") {
+                $outdoor_checked = "checked";
+            } else if($seating == "Lounge") {
+                $lounge_checked = "checked";
+            } else if($seating == "Bar") {
+                $bar_checked = "checked";
+            }
+        }
+    } else if($detail['hotel_field_id'] == 14) {
+        $menu_sel_arr = explode(",",$detail['hotel_field_val']);
+        foreach($menu_sel_arr as $menu_sel) {
+            if($menu_sel == "alacarte") {
+                $alacarte_check = "checked";
+                $script[] = "<script>$(document).ready(function(){ $('#alacarte_check').toggle(); });</script>";
+            } else {
+                $buffet_check = "checked";
+                $script[] = "<script>$(document).ready(function(){ $('#buffet_check').toggle(); });</script>";
+            }
+        }
+    } else if($detail['hotel_field_id'] == 15) {
+        $banquet = $detail['hotel_field_val'];
+        if ($banquet == "Yes") {
+            $banquet_yes_check = "checked";
+        } else {
+            $banquet_no_check = "checked";
+        }
+    } else if($detail['hotel_field_id'] == 16) {
+        $opening_time = $detail['hotel_field_val'];
+    } else if($detail['hotel_field_id'] == 17) {
+        $closing_time = $detail['hotel_field_val'];
+    } else if($detail['hotel_field_id'] == 18) {
+        $visitor_attraction = $detail['hotel_field_val'];
+    } else if($detail['hotel_field_id'] == 19) {
+        
+    } else if($detail['hotel_field_id'] == 20) {
+        
+    } else if($detail['hotel_field_id'] == 21) {
+        $value_for_2 = $detail['hotel_field_val'];
+    }
+} 
 ?>
 
 <body>
@@ -206,7 +289,7 @@ if(isset($_POST['form_submit'])) {
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Create Restaurant</h1>
+                    <h1 class="page-header">Edit Restaurant</h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -215,7 +298,7 @@ if(isset($_POST['form_submit'])) {
                 <div class="col-lg-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Create Restaurant
+                            Edit Restaurant
                         </div>
                         <div class="panel-body">
                             <div class="row">
@@ -223,7 +306,7 @@ if(isset($_POST['form_submit'])) {
                                     <form role="form" action="create_restaurant.php" method="post" enctype="multipart/form-data">
                                         <div class="form-group">
                                             <label>Name of the Hotel</label>
-                                            <input class="form-control" name="rest_name" required="required" placeholder="Enter Hotel Name">
+                                            <input class="form-control" name="rest_name" required="required" placeholder="Enter Hotel Name" value="<?php echo $hotel_name ?>">
                                             <p class="help-block">Example "JW Marriot".</p>
                                         </div>
                                         
@@ -231,44 +314,44 @@ if(isset($_POST['form_submit'])) {
                                             <label>Type</label>
                                             <div class="radio">
                                                 <label>
-                                                    <input type="radio" name="type" id="optionsRadios1" value="Restaurant" checked>Restaurant
+                                                    <input type="radio" name="type" id="optionsRadios1" value="Restaurant" <?php echo $rest_checked; ?>>Restaurant
                                                 </label>
                                             </div>
                                             <div class="radio">
                                                 <label>
-                                                    <input type="radio" name="type" id="optionsRadios2" value="Cafe">Cafe
+                                                    <input type="radio" name="type" id="optionsRadios2" value="Cafe" <?php echo $cafe_checked; ?>>Cafe
                                                 </label>
                                             </div>
                                             <div class="radio">
                                                 <label>
-                                                    <input type="radio" name="type" id="optionsRadios2" value="Dhaba">Dhaba
+                                                    <input type="radio" name="type" id="optionsRadios2" value="Dhaba" <?php echo $dhaba_checked; ?>>Dhaba
                                                 </label>
                                             </div>
-                                            <input class="form-control" name="hotel_name" required="required" placeholder="Enter Restaurant/Cafe/Dhaba name">
+                                            <input class="form-control" name="hotel_name" required="required" placeholder="Enter Restaurant/Cafe/Dhaba name" value="<?php echo $rest_name ?>">
                                             <p class="help-block">Example "Chawla".</p>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label>Description</label>
-                                            <input class="form-control" name="rest_desc" required="required" placeholder="Description of Hotel">
+                                            <input class="form-control" name="rest_desc" required="required" value="<?php echo $rest_desc ?>" placeholder="Description of Hotel">
                                             <p class="help-block">Example "Bakery".</p>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label>Visitor Attraction</label>
-                                            <input class="form-control" name="rest_known_for" required="required" placeholder="What is the hotel known for ?">
+                                            <input class="form-control" name="rest_known_for" required="required" placeholder="What is the hotel known for ?" value="<?php echo $visitor_attraction ?>">
                                             <p class="help-block">Example "The must-go-to place in Chandigarh for THE Butter Chicken experience!".</p>
                                         </div>
                                         
                                         
                                         <div class="form-group">
                                             <label>Address</label>
-                                            <textarea class="form-control" name="address" required="required" placeholder="Enter Complete Address here" rows="3"></textarea>
+                                            <textarea class="form-control" name="address" required="required" placeholder="Enter Complete Address here" rows="3"><?php echo $address; ?></textarea>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label>Area</label>
-                                            <input class="form-control" name="area" required="required" placeholder="Enter the Area">
+                                            <input class="form-control" name="area" required="required" placeholder="Enter the Area" value="<?php echo $area; ?>">
                                             <p class="help-block">Example "Sector-43A".</p>
                                         </div>
                                         
@@ -298,8 +381,8 @@ if(isset($_POST['form_submit'])) {
                                         
                                         <div class="form-group">
                                             <label>Phone</label>
-                                            <input name="main" class="form-control" placeholder="Main Number"> <br>
-                                            <input name="alt" class="form-control" placeholder="Alternate Number">                                           
+                                            <input name="main" class="form-control" placeholder="Main Number" value="<?php echo $main_phone; ?>"> <br>
+                                            <input name="alt" class="form-control" placeholder="Alternate Number" value="<?php echo $alt_phone; ?>">                                           
                                         </div>
                                         
                                         <div class="form-group">
@@ -318,12 +401,12 @@ if(isset($_POST['form_submit'])) {
                                             <label>Serves</label>
                                             <div class="checkbox">
                                                 <label>
-                                                    <input name="serves[]" type="checkbox" value="Veg">Veg
+                                                    <input name="serves[]" type="checkbox" value="Veg" <?php echo $veg_checked; ?>>Veg
                                                 </label>
                                             </div>
                                             <div class="checkbox">
                                                 <label>
-                                                    <input name="serves[]" type="checkbox" value="Non-Veg">Non-Veg
+                                                    <input name="serves[]" type="checkbox" value="Non-Veg" <?php echo $nonveg_checked; ?>>Non-Veg
                                                 </label>
                                             </div>
                                         </div>
@@ -332,12 +415,12 @@ if(isset($_POST['form_submit'])) {
                                             <label>Alcohol</label>
                                             <div class="radio">
                                                 <label>
-                                                    <input type="radio" name="alcohol" id="optionsRadios1" value="yes" checked>Yes
+                                                    <input type="radio" name="alcohol" id="optionsRadios1" value="yes" <?php echo $alcohol_yes; ?>>Yes
                                                 </label>
                                             </div>
                                             <div class="radio">
                                                 <label>
-                                                    <input type="radio" name="alcohol" id="optionsRadios2" value="no">No
+                                                    <input type="radio" name="alcohol" id="optionsRadios2" value="no" <?php echo $alcohol_no; ?>>No
                                                 </label>
                                             </div>
                                         </div>
@@ -360,27 +443,27 @@ if(isset($_POST['form_submit'])) {
                                             <label>Seating</label>
                                             <div class="checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="seating[]" value="Dining">Dining
+                                                    <input type="checkbox" name="seating[]" value="Dining" <?php echo $dine_checked ?>>Dining
                                                 </label>
                                             </div>
                                             <div class="checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="seating[]" value="Roof">Open/Roof
+                                                    <input type="checkbox" name="seating[]" value="Roof" <?php echo $roof_checked ?>>Open/Roof
                                                 </label>
                                             </div>
                                             <div class="checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="seating[]" value="Outdoor">Outdoor
+                                                    <input type="checkbox" name="seating[]" value="Outdoor" <?php echo $outdoor_checked ?>>Outdoor
                                                 </label>
                                             </div>
                                             <div class="checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="seating[]" value="Lounge">Lounge
+                                                    <input type="checkbox" name="seating[]" value="Lounge" <?php echo $lounge_checked ?>>Lounge
                                                 </label>
                                             </div>
                                              <div class="checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="seating[]" value="Lounge">Bar
+                                                    <input type="checkbox" name="seating[]" value="Bar" <?php echo $bar_checked ?>>Bar
                                                 </label>
                                             </div>
                                             
@@ -390,37 +473,37 @@ if(isset($_POST['form_submit'])) {
                                             <label>Menu Selection</label>
                                             <div class="checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="menu_sel[]" onclick="displayMenuSel('alacarte_check')" value="alacarte">À la carte
+                                                    <input type="checkbox" name="menu_sel[]" onclick="displayMenuSel('alacarte_check')" value="alacarte" <?php echo $alacarte_check ?>>À la carte
                                                 </label>
                                             </div>
                                             
                                             <div id="alacarte_check" style="padding-left: 50px; display: none;">
                                                 <label class="checkbox-inline">
-                                                    <input type="checkbox" name="alacarte_check[]" value="Breakfast">Breakfast
+                                                    <input type="checkbox" name="alacarte_check[]" value="Breakfast" <?php echo $al_bf_check ?>>Breakfast
                                                 </label>
                                                 <label class="checkbox-inline">
-                                                    <input type="checkbox" name="alacarte_check[]" value="Lunch">Lunch
+                                                    <input type="checkbox" name="alacarte_check[]" value="Lunch" <?php echo $al_lunch_check ?>>Lunch
                                                 </label>
                                                 <label class="checkbox-inline">
-                                                    <input type="checkbox" name="alacarte_check[]" value="Dinner">Dinner
+                                                    <input type="checkbox" name="alacarte_check[]" value="Dinner" <?php echo $al_dinner_check ?>>Dinner
                                                 </label>
                                                 
                                             </div>
                                             
                                             <div class="checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="menu_sel[]"  onclick="displayMenuSel('buffet_check')" value="Buffet">Buffet
+                                                    <input type="checkbox" name="menu_sel[]"  onclick="displayMenuSel('buffet_check')" value="Buffet" <?php echo $buffet_check ?>>Buffet
                                                 </label>
                                             </div>
                                             <div id="buffet_check" style="padding-left: 50px; display: none;">
                                                 <label class="checkbox-inline">
-                                                    <input type="checkbox" name="buffet_check[]" value="Breakfast">Breakfast
+                                                    <input type="checkbox" name="buffet_check[]" value="Breakfast" <?php echo $buffet_bf_check ?>>Breakfast
                                                 </label>
                                                 <label class="checkbox-inline">
-                                                    <input type="checkbox" name="buffet_check[]" value="Lunch">Lunch
+                                                    <input type="checkbox" name="buffet_check[]" value="Lunch" <?php echo $buffet_lunch_check ?>>Lunch
                                                 </label>
                                                 <label class="checkbox-inline">
-                                                    <input type="checkbox" name="buffet_check[]" value="Dinner">Dinner
+                                                    <input type="checkbox" name="buffet_check[]" value="Dinner" <?php echo $buffet_dinner_check ?>>Dinner
                                                 </label>
                                                 
                                             </div>
@@ -430,12 +513,12 @@ if(isset($_POST['form_submit'])) {
                                             <label>Banquet</label>
                                             <div class="radio">
                                                 <label>
-                                                    <input type="radio" name="banquet" id="optionsRadios1" value="Yes" checked>Yes
+                                                    <input type="radio" name="banquet" id="optionsRadios1" value="Yes" <?php echo $banquet_yes_check; ?>>Yes
                                                 </label>
                                             </div>
                                             <div class="radio">
                                                 <label>
-                                                    <input type="radio" name="banquet" id="optionsRadios2" value="No">No
+                                                    <input type="radio" name="banquet" id="optionsRadios2" value="No" <?php echo $banquet_no_check; ?>>No
                                                 </label>
                                             </div>
                                             <input type="file" name="banquet_image[]" multiple="multiple" />
@@ -443,17 +526,17 @@ if(isset($_POST['form_submit'])) {
                                         
                                          <div class="form-group">
                                             <label>Opening Time</label>
-                                            <input required="required" data-format="hh:mm:ss" name="opening_time" id="opening_time" class="form-control">
+                                            <input required="required" name="opening_time" class="form-control" value="<?php echo $opening_time ?>">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label>Closing Time</label>
-                                            <input required="required" name="closing_time" class="form-control">
+                                            <input required="required" name="closing_time" class="form-control" value="<?php echo $closing_time ?>">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label>Value for 2</label>
-                                            <input required="required" name="value_for_two" class="form-control" placeholder="Enter Amount">
+                                            <input required="required" name="value_for_two" class="form-control" placeholder="Enter Amount" value="<?php echo $value_for_2 ?>">
                                         </div>
                                         
                                         <div class="form-group">
@@ -496,13 +579,18 @@ if(isset($_POST['form_submit'])) {
     <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
 
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>   
+    <script src="../dist/js/sb-admin-2.js"></script>
     <script>
         function displayMenuSel(id)
         {
             $('#'+id).toggle();
         }
     </script>
+    <?php
+    foreach($script as $display) {
+        echo $display;
+    }
+    ?>
 </body>
 
 </html>
