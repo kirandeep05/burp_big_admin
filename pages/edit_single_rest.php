@@ -5,7 +5,7 @@ include '../include/Connection.class.php';
 include '../include/Admin.class.php';
 include './header.php'; 
 $adminObj = new Admin();
-
+$hotel_id = isset($_GET['hotel_id'])?$_GET['hotel_id']:(isset($_POST['hotel_id'])?$_POST['hotel_id']:"");
 if(isset($_POST['form_submit'])) {
     $rest_name = isset($_POST['rest_name'])?$_POST['rest_name']:"";
     $hotel_name = isset($_POST['hotel_name'])?$_POST['hotel_name']:"";
@@ -81,64 +81,66 @@ if(isset($_POST['form_submit'])) {
     
     
     if($rest_name != "") {
-        $check_rest = $adminObj->checkRestaurant($rest_name);
+        //$check_rest = $adminObj->checkRestaurant($rest_name);
+        $check_rest = array();
         if(empty($check_rest)) {
-           $rest_id = $adminObj->insertRestaurant($rest_name);
-           $check_hotel = $adminObj->checkHotel($hotel_name);
+          // $rest_id = $adminObj->insertRestaurant($rest_name);
+           //$check_hotel = $adminObj->checkHotel($hotel_name);
+            $check_hotel = array();
            if(empty($check_hotel)) {
-                $hotel_id = $adminObj->insertHotel($hotel_name, $rest_id);
+                $adminObj->updateHotel($hotel_name, $hotel_id);                
                 for($i=0;$i<count($field_id);$i++) {
-                    $adminObj->insertHotelDetails($hotel_id, $field_id[$i], $field_val[$i]);
+                    $adminObj->updateHotelDetails($hotel_id, $field_id[$i], $field_val[$i]);
                 }
-                for($j=0;$j<count($alacarte_menu['name']);$j++) {
-                    $alacarte_file['name'] = $alacarte_menu['name'][$j];
-                    $alacarte_file['type'] = $alacarte_menu['type'][$j];
-                    $alacarte_file['tmp_name'] = $alacarte_menu['tmp_name'][$j];
-                    $alacarte_file['error'] = $alacarte_menu['error'][$j];
-                    $alacarte_file['size'] = $alacarte_menu['size'][$j];
-                    $image_path = $adminObj->uploadFile($alacarte_file, "alacarte");
-                    if($image_path != "-1") {
-                        $adminObj->insertHotelMenu(1, $image_path, $hotel_id);
-                    }
-                }
-                
-                for($j=0;$j<count($buffet_menu['name']);$j++) {
-                    $buffet_file['name'] = $buffet_menu['name'][$j];
-                    $buffet_file['type'] = $buffet_menu['type'][$j];
-                    $buffet_file['tmp_name'] = $buffet_menu['tmp_name'][$j];
-                    $buffet_file['error'] = $buffet_menu['error'][$j];
-                    $buffet_file['size'] = $buffet_menu['size'][$j];
-                    $image_path = $adminObj->uploadFile($buffet_file, "buffet");
-                    if($image_path != "-1") {
-                        $adminObj->insertHotelMenu(2, $image_path, $hotel_id);
-                    }
-                }
-                
-                for($j=0;$j<count($bar_menu['name']);$j++) {
-                    $bar_file['name'] = $bar_menu['name'][$j];
-                    $bar_file['type'] = $bar_menu['type'][$j];
-                    $bar_file['tmp_name'] = $bar_menu['tmp_name'][$j];
-                    $bar_file['error'] = $bar_menu['error'][$j];
-                    $bar_file['size'] = $bar_menu['size'][$j];
-                    $image_path = $adminObj->uploadFile($bar_file, "bar");
-                    if($image_path != "-1") {
-                        $adminObj->insertHotelMenu(3, $image_path, $hotel_id);
-                    }
-                }
-                
-                if($banquet == "Yes") {
-                    for($j=0;$j<count($banquet_images['name']);$j++) {
-                        $banquet_file['name'] = $banquet_images['name'][$j];
-                        $banquet_file['type'] = $banquet_images['type'][$j];
-                        $banquet_file['tmp_name'] = $banquet_images['tmp_name'][$j];
-                        $banquet_file['error'] = $banquet_images['error'][$j];
-                        $banquet_file['size'] = $banquet_images['size'][$j];
-                        $image_path = $adminObj->uploadFile($banquet_file, "banquet");
-                        if($image_path != "-1") {
-                            $adminObj->insertBanquetImage($image_path, $hotel_id);
-                        }
-                    }
-                }
+//                for($j=0;$j<count($alacarte_menu['name']);$j++) {
+//                    $alacarte_file['name'] = $alacarte_menu['name'][$j];
+//                    $alacarte_file['type'] = $alacarte_menu['type'][$j];
+//                    $alacarte_file['tmp_name'] = $alacarte_menu['tmp_name'][$j];
+//                    $alacarte_file['error'] = $alacarte_menu['error'][$j];
+//                    $alacarte_file['size'] = $alacarte_menu['size'][$j];
+//                    $image_path = $adminObj->uploadFile($alacarte_file, "alacarte");
+//                    if($image_path != "-1") {
+//                        $adminObj->insertHotelMenu(1, $image_path, $hotel_id);
+//                    }
+//                }
+//                
+//                for($j=0;$j<count($buffet_menu['name']);$j++) {
+//                    $buffet_file['name'] = $buffet_menu['name'][$j];
+//                    $buffet_file['type'] = $buffet_menu['type'][$j];
+//                    $buffet_file['tmp_name'] = $buffet_menu['tmp_name'][$j];
+//                    $buffet_file['error'] = $buffet_menu['error'][$j];
+//                    $buffet_file['size'] = $buffet_menu['size'][$j];
+//                    $image_path = $adminObj->uploadFile($buffet_file, "buffet");
+//                    if($image_path != "-1") {
+//                        $adminObj->insertHotelMenu(2, $image_path, $hotel_id);
+//                    }
+//                }
+//                
+//                for($j=0;$j<count($bar_menu['name']);$j++) {
+//                    $bar_file['name'] = $bar_menu['name'][$j];
+//                    $bar_file['type'] = $bar_menu['type'][$j];
+//                    $bar_file['tmp_name'] = $bar_menu['tmp_name'][$j];
+//                    $bar_file['error'] = $bar_menu['error'][$j];
+//                    $bar_file['size'] = $bar_menu['size'][$j];
+//                    $image_path = $adminObj->uploadFile($bar_file, "bar");
+//                    if($image_path != "-1") {
+//                        $adminObj->insertHotelMenu(3, $image_path, $hotel_id);
+//                    }
+//                }
+//                
+//                if($banquet == "Yes") {
+//                    for($j=0;$j<count($banquet_images['name']);$j++) {
+//                        $banquet_file['name'] = $banquet_images['name'][$j];
+//                        $banquet_file['type'] = $banquet_images['type'][$j];
+//                        $banquet_file['tmp_name'] = $banquet_images['tmp_name'][$j];
+//                        $banquet_file['error'] = $banquet_images['error'][$j];
+//                        $banquet_file['size'] = $banquet_images['size'][$j];
+//                        $image_path = $adminObj->uploadFile($banquet_file, "banquet");
+//                        if($image_path != "-1") {
+//                            $adminObj->insertBanquetImage($image_path, $hotel_id);
+//                        }
+//                    }
+//                }
                 
                 $ala_bf = 0;
                 $ala_lunch = 0;
@@ -169,8 +171,8 @@ if(isset($_POST['form_submit'])) {
                         }
                     }
                 }
-                $adminObj->insertMenuSelection(1, $ala_bf, $ala_lunch, $ala_dinner,$hotel_id, '1');
-                $adminObj->insertMenuSelection(2, $buffet_bf, $buffet_lunch, $buffet_dinner,$hotel_id, '1');
+                $adminObj->updateMenuSelection(1, $ala_bf, $ala_lunch, $ala_dinner,$hotel_id);
+                $adminObj->updateMenuSelection(2, $buffet_bf, $buffet_lunch, $buffet_dinner,$hotel_id);
                 
            } else {
                $error = "Hotel name exists";
@@ -183,12 +185,12 @@ if(isset($_POST['form_submit'])) {
     }
 }
 
-$hotel_id = isset($_GET['hotel_id'])?$_GET['hotel_id']:"-1";
+$script = array();
 $rest_name_arr = $adminObj->getRestaurantName($hotel_id);
 $hotel_name = $rest_name_arr['hotel_name'];
 $rest_name = $rest_name_arr['rest_name'];
 $details = $adminObj->getHotelDetails($hotel_id);
-$dhaba_checked = $rest_checked = $cafe_checked = $veg_checked = $nonveg_checked = $alcohol_yes = $alcohol_no = $dine_checked = $roof_checked = $lounge_checked = $bar_checked = $outdoor_checked = $alacarte_check = $buffet_check = $al_bf_check = $al_lunch_check = $al_dinner_check = $buffet_bf_check = $buffet_lunch_check = $buffet_dinner_check = $banquet_yes_check = $banquet_no_check = "";
+$dhaba_checked = $rest_checked = $cafe_checked = $club_checked = $veg_checked = $nonveg_checked = $alcohol_yes = $alcohol_no = $dine_checked = $roof_checked = $lounge_checked = $bar_checked = $rapid_checked = $outdoor_checked = $alacarte_check = $buffet_check = $al_bf_check = $al_lunch_check = $al_dinner_check = $buffet_bf_check = $buffet_lunch_check = $buffet_dinner_check = $banquet_yes_check = $banquet_no_check = $delivery_yes = $delivery_no = "";
 foreach($details as $detail) {
     if($detail['hotel_field_id'] == 2) {
         $rest_desc = $detail['hotel_field_val'];
@@ -200,6 +202,10 @@ foreach($details as $detail) {
             $rest_checked = "checked";
         } else if($type == "Cafe") {
             $cafe_checked = "checked";
+        } else if ($type == "Rapid Munch") {
+            $rapid_checked = "checked";
+        } else if ($type == "Night Club") {
+            $club_checked = "checked";
         }
     } else if($detail['hotel_field_id'] == 4) {
         $address = $detail['hotel_field_val'];
@@ -251,9 +257,32 @@ foreach($details as $detail) {
         foreach($menu_sel_arr as $menu_sel) {
             if($menu_sel == "alacarte") {
                 $alacarte_check = "checked";
+                $menu_sel_arr_temp = $adminObj->getMenuSelection("1", $hotel_id);
+                if($menu_sel_arr_temp['breakfast'] == "1") {
+                    $al_bf_check = "checked";
+                }
+                if($menu_sel_arr_temp['lunch'] == "1") {
+                    $al_lunch_check = "checked";
+                }
+                
+                if($menu_sel_arr_temp['dinner'] == "1") {
+                    $al_dinner_check = "checked";
+                }
                 $script[] = "<script>$(document).ready(function(){ $('#alacarte_check').toggle(); });</script>";
             } else {
                 $buffet_check = "checked";
+                $menu_sel_arr_temp = $adminObj->getMenuSelection("2", $hotel_id);
+                if($menu_sel_arr_temp['breakfast'] == "1") {
+                    $buffet_bf_check = "checked";
+                } 
+                
+                if($menu_sel_arr_temp['lunch'] == "1") {
+                    $buffet_lunch_check = "checked";
+                }  
+                
+                if($menu_sel_arr_temp['dinner'] == "1") {
+                    $buffet_dinner_check = "checked";
+                }
                 $script[] = "<script>$(document).ready(function(){ $('#buffet_check').toggle(); });</script>";
             }
         }
@@ -271,9 +300,14 @@ foreach($details as $detail) {
     } else if($detail['hotel_field_id'] == 18) {
         $visitor_attraction = $detail['hotel_field_val'];
     } else if($detail['hotel_field_id'] == 19) {
-        
+        $cuisines_arr = explode(",",$detail['hotel_field_val']);
     } else if($detail['hotel_field_id'] == 20) {
-        
+        $delivery_check = $detail['hotel_field_val'];
+        if($delivery_check == "yes") {
+          $delivery_yes = "checked";  
+        } else {
+          $delivery_no = "checked";  
+        }
     } else if($detail['hotel_field_id'] == 21) {
         $value_for_2 = $detail['hotel_field_val'];
     }
@@ -303,11 +337,22 @@ foreach($details as $detail) {
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-lg-6">
-                                    <form role="form" action="create_restaurant.php" method="post" enctype="multipart/form-data">
+                                    <form role="form" action="edit_single_rest.php" method="post" enctype="multipart/form-data">
                                         <div class="form-group">
                                             <label>Name of the Hotel</label>
-                                            <input class="form-control" name="rest_name" required="required" placeholder="Enter Hotel Name" value="<?php echo $hotel_name ?>">
-                                            <p class="help-block">Example "JW Marriot".</p>
+                                            <select  name="hotel_id" class="form-control">
+                                                <?php 
+                                                $hotellist = $adminObj->getRestaurants(); 
+                                                foreach($hotellist as $hotels) {
+                                                    if($hotels['rest_name'] == $rest_name_arr['rest_name']) {
+                                                        $check_hotel_name = "selected";
+                                                    } else {
+                                                        $check_hotel_name = "";
+                                                    }
+                                                ?>
+                                                <option value="<?php echo $hotels['rest_id']; ?>" <?php echo $check_hotel_name; ?> ><?php echo $hotels['rest_name']; ?></option>
+                                                <?php } ?>
+                                            </select>
                                         </div>
                                         
                                         <div class="form-group">
@@ -325,6 +370,16 @@ foreach($details as $detail) {
                                             <div class="radio">
                                                 <label>
                                                     <input type="radio" name="type" id="optionsRadios2" value="Dhaba" <?php echo $dhaba_checked; ?>>Dhaba
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="type" id="optionsRadios2" value="Rapid Munch" <?php echo $rapid_checked; ?>>Rapid Munch
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="type" id="optionsRadios2" value="Night Club" <?php echo $club_checked; ?>>Night Club
                                                 </label>
                                             </div>
                                             <input class="form-control" name="hotel_name" required="required" placeholder="Enter Restaurant/Cafe/Dhaba name" value="<?php echo $rest_name ?>">
@@ -391,9 +446,13 @@ foreach($details as $detail) {
                                                 <?php 
                                                 $cuisinelist = $adminObj->getCuisines(); 
                                                 foreach($cuisinelist as $cuisine) {
+                                                    if(in_array($cuisine['id'], $cuisines_arr)) {                                                       
                                                 ?>
-                                                <option value="<?php echo $cuisine['id']; ?>"><?php echo $cuisine['name']; ?></option>
-                                                <?php } ?>
+                                                    <option value="<?php echo $cuisine['id']; ?>" selected><?php echo $cuisine['name']; ?></option>
+                                                <?php } else { ?>
+                                                    <option value="<?php echo $cuisine['id']; ?>"><?php echo $cuisine['name']; ?></option>
+                                                <?php        } 
+                                                }?>
                                             </select>
                                         </div>
                                         
@@ -429,12 +488,12 @@ foreach($details as $detail) {
                                             <label>Delivery</label>
                                             <div class="radio">
                                                 <label>
-                                                    <input type="radio" name="delivery" id="optionsRadios1" value="yes" checked>Yes
+                                                    <input type="radio" name="delivery" id="optionsRadios1" value="yes" <?php echo $delivery_yes; ?>>Yes
                                                 </label>
                                             </div>
                                             <div class="radio">
                                                 <label>
-                                                    <input type="radio" name="delivery" id="optionsRadios2" value="no">No
+                                                    <input type="radio" name="delivery" id="optionsRadios2" value="no" <?php echo $delivery_no; ?>>No
                                                 </label>
                                             </div>
                                         </div>
@@ -540,6 +599,11 @@ foreach($details as $detail) {
                                         </div>
                                         
                                         <div class="form-group">
+                                            <label>Upload Cover Pic</label> <br/>
+                                            <input name="cover_pic" type="file">                                            
+                                        </div>
+                                        
+                                        <div class="form-group">
                                             <label>All Menu</label> <br/>
                                             <label>À la carte</label> <input name="alacarte_menu[]" type="file" multiple="multiple">
                                             <label>Buffet</label> <input name="buffet_menu[]" type="file" multiple="multiple">
@@ -550,6 +614,7 @@ foreach($details as $detail) {
                                             <label>Gallery</label>
                                             <input type="file" name="gallery[]" multiple="multiple">                                            
                                         </div>
+                                        <input type="hidden" name="hotel_id" value="<?php echo $hotel_id ?>" />
                                         <input type="hidden" name="form_submit" value="1" />                                        
                                         <button type="submit" class="btn btn-default">Submit Button</button>
                                         <button type="reset" class="btn btn-default">Reset Button</button>

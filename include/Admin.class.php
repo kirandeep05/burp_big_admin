@@ -28,6 +28,20 @@ class Admin {
         return $data;
     }
     
+    public function getMenuSelection($type_id, $hotel_id) {
+
+        $query = "SELECT `breakfast`, `lunch`, `dinner` FROM `bb_menu_selection` WHERE `type_id` = :type_id AND `hotel_id` = :hotel_id";
+
+        $qh = $this->con->getQueryHandler($query, array("type_id" => $type_id,"hotel_id"=>$hotel_id));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data = $res;
+        }
+
+        return $data;
+    }
+    
+    
     public function checkRestaurant($name) {
 
         $query = "SELECT `rest_id` FROM `bb_rest` WHERE LOWER(`rest_name`) = :rest_name";
@@ -54,6 +68,19 @@ class Admin {
         $query = "SELECT `hotel_id` FROM `bb_hotel` WHERE LOWER(`hotel_name`) = :hotel_name";
 
         $qh = $this->con->getQueryHandler($query, array("hotel_name" => $name));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res;
+        }
+
+        return $data;
+    }
+    
+    public function getRestaurants() {
+
+        $query = "SELECT `rest_id`, `rest_name` FROM `bb_rest` WHERE `active` = '1'";
+
+        $qh = $this->con->getQueryHandler($query, array());
         $data = array();
         while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
             $data[] = $res;
@@ -99,6 +126,17 @@ class Admin {
         return $id;
     }
     
+    public function updateHotel($name, $hotel_id) {
+
+        $query = "UPDATE `bb_hotel` SET `hotel_name` = :hotel_name, `updated_date`= NOW() WHERE `hotel_id` = :hotel_id";
+
+        $bindParams = array("hotel_name" => $name,"hotel_id"=>$hotel_id);
+
+        $id = $this->con->insertQuery($query, $bindParams);
+
+        return $id;
+    }
+    
     public function insertHotelMenu($menu_type,$image_path, $hotel_id) {
 
         $query = "INSERT INTO `bb_hotel_menu`(`menu_type`, `image_path`, `hotel_id`) VALUES (:menu_type,:image_path,:hotel_id)";
@@ -116,6 +154,18 @@ class Admin {
                 . "VALUES (:type_id,:breakfast,:lunch,:dinner,:hotel_id,:active)";
 
         $bindParams = array("type_id" => $menu_type_id,"breakfast"=>$breakfast, "lunch" => $lunch, "dinner" => $dinner,"hotel_id"=>$hotel_id ,"active" => $active);
+
+        $id = $this->con->insertQuery($query, $bindParams);
+
+        return $id;
+    }
+    
+    public function updateMenuSelection($menu_type_id, $breakfast, $lunch, $dinner,$hotel_id) {
+
+        $query = "UPDATE `bb_menu_selection` SET `breakfast`= :breakfast,`lunch`= :lunch,`dinner`= :dinner, `updated_date`= NOW() "
+                . "WHERE `type_id`= :type_id AND `hotel_id`= :hotel_id";
+
+        $bindParams = array("type_id" => $menu_type_id,"breakfast"=>$breakfast, "lunch" => $lunch, "dinner" => $dinner,"hotel_id"=>$hotel_id);
 
         $id = $this->con->insertQuery($query, $bindParams);
 
@@ -140,6 +190,18 @@ class Admin {
                 . "(:hotel_id, :hotel_field_id, :hotel_field_val,:active)";
 
         $bindParams = array("hotel_id" => $hotel_id,"hotel_field_id"=>$hotel_field_id,"hotel_field_val"=>$hotel_field_val, "active" => "1");
+
+        $id = $this->con->insertQuery($query, $bindParams);
+
+        return $id;
+    }
+    
+    public function updateHotelDetails($hotel_id, $hotel_field_id, $hotel_field_val) {
+
+        $query = "UPDATE `bb_hotel_details` SET `hotel_field_val`=:hotel_field_val WHERE "
+                . "`hotel_id` = :hotel_id AND `hotel_field_id` = :hotel_field_id";
+
+        $bindParams = array("hotel_id" => $hotel_id,"hotel_field_id"=>$hotel_field_id,"hotel_field_val"=>$hotel_field_val);
 
         $id = $this->con->insertQuery($query, $bindParams);
 

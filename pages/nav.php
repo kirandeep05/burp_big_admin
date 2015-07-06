@@ -236,9 +236,11 @@
                             <!-- /input-group -->
                         </li>
                         <li>
-                            <a href="index.html"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                            <a href="index.php"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                         </li>                        
-
+                        <li>
+                            <a href="create_hotel.php"><i class="fa fa-table fa-fw"></i> Create Hotel</a>
+                        </li>
                         <li>
                             <a href="create_restaurant.php"><i class="fa fa-table fa-fw"></i> Create Restaurant</a>
                         </li>
