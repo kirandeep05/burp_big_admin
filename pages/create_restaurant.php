@@ -78,7 +78,7 @@ if(isset($_POST['form_submit'])) {
     $field_val[] = $delivery;
     $field_val[] = $value_for_2;
     
-    
+    //var_dump($field_val);
     
     $rest_id = $_POST['hotel_id'];
     $check_hotel = $adminObj->checkHotel($hotel_name);

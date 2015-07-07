@@ -219,6 +219,32 @@ class Admin {
         return $id;
     }
     
+    public function getGallery($hotel_id) {
+
+        $query = "SELECT `gallery_id`, `image_path` FROM `bb_gallery` WHERE  `hotel_id` = :hotel_id";
+
+        $qh = $this->con->getQueryHandler($query, array("hotel_id"=>$hotel_id));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res;
+        }
+
+        return $data;
+    }
+    
+    public function getMenu($hotel_id,$menu_type) {
+
+        $query = "SELECT `menu_id`,  `image_path`  FROM `bb_hotel_menu` WHERE `menu_type` = :menu_type AND `hotel_id` = :hotel_id";
+
+        $qh = $this->con->getQueryHandler($query, array("hotel_id"=>$hotel_id, "menu_type"=>$menu_type));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res;
+        }
+
+        return $data;
+    }
+    
     public function getHotelDetails($hotel_id) {
 
         $query = "SELECT `hotel_id`, `hotel_field_id`, `hotel_field_val`, `active` FROM `bb_hotel_details` WHERE `hotel_id` = :hotel_id";

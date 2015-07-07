@@ -606,13 +606,59 @@ foreach($details as $detail) {
                                         <div class="form-group">
                                             <label>All Menu</label> <br/>
                                             <label>À la carte</label> <input name="alacarte_menu[]" type="file" multiple="multiple">
+                                            <div id="links" >
+                                            <?php 
+                                            $alacarte_images_arr = $adminObj->getMenu($hotel_id,"1");                                            
+                                            foreach($alacarte_images_arr as $alacarte_image) {
+                                            ?>
+                                            <a href="../images/alacarte/<?php echo $alacarte_image['image_path']; ?>" title="Banana" data-gallery>
+                                                <img src="../images/alacarte/<?php echo $alacarte_image['image_path']; ?>" alt="Banana">
+                                            </a>
+                                            <?php } ?>                                                                                     
+                                            </div>
                                             <label>Buffet</label> <input name="buffet_menu[]" type="file" multiple="multiple">
-                                            <label>Bar</label> <input name="bar_menu[]" type="file" multiple="multiple">                                                                                       
+                                            <div id="links" >
+                                            <?php 
+                                            $buffet_images_arr = $adminObj->getMenu($hotel_id,"2");
+                                            foreach($buffet_images_arr as $buffet_image) {
+                                            ?>
+                                                <a href="../images/buffet/<?php echo $buffet_image['image_path']; ?>" title="Banana" data-gallery>
+                                                    <img src="../images/buffet/<?php echo $buffet_image['image_path']; ?>" alt="Banana">
+                                            </a>
+                                            <?php } ?>                                                                                     
+                                            </div>
+                                            <label>Bar</label> <input name="bar_menu[]" type="file" multiple="multiple">
+                                            <div id="links" >
+                                            <?php 
+                                            $bar_images_arr = $adminObj->getMenu($hotel_id,"1");
+                                            foreach($bar_images_arr as $bar_image) {
+                                            ?>
+                                                <a href="../images/bar/<?php echo $bar_image['image_path']; ?>" title="Banana" data-gallery>
+                                                <img src="../images/bar/<?php echo $bar_image['image_path']; ?>" alt="Banana">
+                                            </a>
+                                            <?php } ?>                                                                                     
+                                        </div>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label>Gallery</label>
                                             <input type="file" name="gallery[]" multiple="multiple">                                            
+                                        </div>
+                                        <!--<div class="form-group">
+                                            <button id="image-gallery-button" type="button" class="btn btn-primary btn-lg">
+                                                <i class="glyphicon glyphicon-picture"></i>
+                                                Launch Image Gallery
+                                            </button>
+                                        </div>-->
+                                        <div id="links" >
+                                            <?php 
+                                            $gallery_images_arr = $adminObj->getGallery($hotel_id);
+                                            foreach($gallery_images_arr as $gallery_image) {
+                                            ?>
+                                            <a href="../images/gallery/<?php echo $gallery_image['image_path']; ?>" title="Banana" data-gallery>
+                                                <img src="../images/gallery/<?php echo $gallery_image['image_path']; ?>" alt="Banana">
+                                            </a>
+                                            <?php } ?>                                                                                     
                                         </div>
                                         <input type="hidden" name="hotel_id" value="<?php echo $hotel_id ?>" />
                                         <input type="hidden" name="form_submit" value="1" />                                        
@@ -633,7 +679,39 @@ foreach($details as $detail) {
 
     </div>
     <!-- /#wrapper -->
-
+<div id="blueimp-gallery" class="blueimp-gallery">
+    <!-- The container for the modal slides -->
+    <div class="slides"></div>
+    <!-- Controls for the borderless lightbox -->
+    <h3 class="title"></h3>
+    <a class="prev">‹</a>
+    <a class="next">›</a>
+    <a class="close">×</a>
+    <a class="play-pause"></a>
+    <ol class="indicator"></ol>
+    <!-- The modal dialog, which will be used to wrap the lightbox content -->
+    <div class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title"></h4>
+                </div>
+                <div class="modal-body next"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left prev">
+                        <i class="glyphicon glyphicon-chevron-left"></i>
+                        Previous
+                    </button>
+                    <button type="button" class="btn btn-primary next">
+                        Next
+                        <i class="glyphicon glyphicon-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
     <!-- jQuery -->
     <script src="../bower_components/jquery/dist/jquery.min.js"></script>
 
@@ -645,11 +723,18 @@ foreach($details as $detail) {
 
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
+    <script src="//blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js"></script>
+    <script src="../js/bootstrap-image-gallery.min.js"></script>
     <script>
         function displayMenuSel(id)
         {
             $('#'+id).toggle();
         }
+        
+        $('#image-gallery-button').on('click', function (event) {
+            event.preventDefault();
+            blueimp.Gallery($('#links a'), $('#blueimp-gallery').data());
+        });
     </script>
     <?php
     foreach($script as $display) {
