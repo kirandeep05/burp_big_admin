@@ -219,6 +219,8 @@ class Admin {
         return $id;
     }
     
+    
+    
     public function getGallery($hotel_id) {
 
         $query = "SELECT `gallery_id`, `image_path` FROM `bb_gallery` WHERE  `hotel_id` = :hotel_id";
@@ -230,6 +232,30 @@ class Admin {
         }
 
         return $data;
+    }
+    
+    public function insertCuisine($name) {
+
+        $query = "INSERT INTO `bb_cuisine`(`name`) VALUES (:name)";
+
+        $bindParams = array("name" => $name);
+
+        $id = $this->con->insertQuery($query, $bindParams);
+
+        return $id;
+    }
+    
+    public function checkCuisine($name) {
+
+        $query = "SELECT COUNT(*) as cuis FROM `bb_cuisine` WHERE `name` = :name";
+
+        $qh = $this->con->getQueryHandler($query, array("name"=>$name));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data = $res;
+        }
+
+        return $data['cuis'];
     }
     
     public function getMenu($hotel_id,$menu_type) {
@@ -267,8 +293,10 @@ class Admin {
             //exit();
             return "";
         }
+        $ext_arr = explode(".", $file["name"]);        
+        $ext = $ext_arr[count($ext_arr)-1];
         $access_token = uniqid();
-        $filename = $access_token . "-" . time() . session_id() . ".jpg";
+        $filename = $access_token . "-" . time() . session_id() . ".".$ext;
 
         while (file_exists("../images/".$type."/" . $filename)) {
 
@@ -282,6 +310,19 @@ class Admin {
 
             return "-1";
         }
+    }
+    
+    public function validateUser($username,$password) {
+
+        $query = "SELECT count(*) as num FROM `bb_user_login` WHERE `user_name` = :username AND `password` = :password";
+
+        $qh = $this->con->getQueryHandler($query, array("username"=>$username, "password"=>$password));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data = $res;
+        }
+
+        return $data;
     }
 
     

@@ -212,7 +212,7 @@
                         <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
                         </li>
                         <li class="divider"></li>
-                        <li><a href="login.html"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                        <li><a href="logout.php"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
                         </li>
                     </ul>
                     <!-- /.dropdown-user -->
@@ -246,7 +246,10 @@
                         </li>
                         <li>
                             <a href="edit_restaurant.php"><i class="fa fa-table fa-fw"></i> Edit Restaurant</a>
-                        </li>                        
+                        </li>
+                        <li>
+                            <a href="add_cuisines.php"><i class="fa fa-table fa-fw"></i> Add Cuisines</a>
+                        </li>
                     </ul>
                 </div>
                 <!-- /.sidebar-collapse -->
