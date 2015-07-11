@@ -349,6 +349,8 @@ foreach($details as $detail) {
         }
     } else if($detail['hotel_field_id'] == 21) {
         $value_for_2 = $detail['hotel_field_val'];
+    } else if($detail['hotel_field_id'] == 22) {
+        $cover_pic_data = $detail['hotel_field_val'];
     }
 } 
 ?>
@@ -635,16 +637,29 @@ foreach($details as $detail) {
                                                 </label>
                                             </div>
                                             <input type="file" name="banquet_image[]" multiple="multiple" />
+                                            <div id="links" >
+                                            <?php 
+                                            $banquet_images_arr = $adminObj->getBanquetImage($hotel_id);                                            
+                                            foreach($banquet_images_arr as $banquet_image ) {
+                                            ?>
+                                            <div class="gall-img">
+                                            <a href="../images/banquet/<?php echo $banquet_image['image_path']; ?>" title="" data-gallery>
+                                                <img src="../images/banquet/<?php echo $banquet_image['image_path']; ?>" alt="">
+                                            </a> <br />
+                                            <button style="margin-top: 5px;" onclick="deleteImage('<?php echo $banquet_image['banquet_id'] ?>','banquet')">Delete</button>
+                                            </div>
+                                            <?php } ?>  
+                                                <div style="clear: both"></div>
                                         </div>
                                         
                                          <div class="form-group">
                                             <label>Opening Time</label>
-                                            <input required="required" name="opening_time" class="form-control" value="<?php echo $opening_time ?>">
+                                            <input required="required" name="opening_time" class="form-control" id="opening_time" value="<?php echo $opening_time ?>">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label>Closing Time</label>
-                                            <input required="required" name="closing_time" class="form-control" value="<?php echo $closing_time ?>">
+                                            <input required="required" name="closing_time" class="form-control" id="closing_time" value="<?php echo $closing_time ?>">
                                         </div>
                                         
                                         <div class="form-group">
@@ -654,7 +669,19 @@ foreach($details as $detail) {
                                         
                                         <div class="form-group">
                                             <label>Upload Cover Pic</label> <br/>
-                                            <input name="cover_pic" type="file">                                            
+                                            <input name="cover_pic" type="file"> 
+                                            <div id="links" >
+                                            <?php                                             
+                                            if($cover_pic_data != "") {
+                                            ?>
+                                            <div class="gall-img">
+                                            <a href="../images/cover_pic/<?php echo $cover_pic_data ?>" title="" data-gallery>
+                                                <img src="../images/cover_pic/<?php echo $cover_pic_data; ?>" alt="">
+                                            </a> <br />                                            
+                                            </div>
+                                            <?php } ?>  
+                                                <div style="clear: both">
+                                            </div>
                                         </div>
                                         
                                         <div class="form-group">
@@ -665,10 +692,14 @@ foreach($details as $detail) {
                                             $alacarte_images_arr = $adminObj->getMenu($hotel_id,"1");                                            
                                             foreach($alacarte_images_arr as $alacarte_image) {
                                             ?>
-                                            <a href="../images/alacarte/<?php echo $alacarte_image['image_path']; ?>" title="Banana" data-gallery>
-                                                <img src="../images/alacarte/<?php echo $alacarte_image['image_path']; ?>" alt="Banana">
-                                            </a>
-                                            <?php } ?>                                                                                     
+                                            <div class="gall-img">
+                                            <a href="../images/alacarte/<?php echo $alacarte_image['image_path']; ?>" title="" data-gallery>
+                                                <img src="../images/alacarte/<?php echo $alacarte_image['image_path']; ?>" alt="">
+                                            </a> <br />
+                                            <button style="margin-top: 5px;" onclick="deleteImage('<?php echo $alacarte_image['menu_id'] ?>','alacarte')">Delete</button>
+                                            </div>
+                                            <?php } ?>  
+                                                <div style="clear: both">
                                             </div>
                                             <label>Buffet</label> <input name="buffet_menu[]" type="file" multiple="multiple">
                                             <div id="links" >
@@ -676,10 +707,14 @@ foreach($details as $detail) {
                                             $buffet_images_arr = $adminObj->getMenu($hotel_id,"2");
                                             foreach($buffet_images_arr as $buffet_image) {
                                             ?>
-                                                <a href="../images/buffet/<?php echo $buffet_image['image_path']; ?>" title="Banana" data-gallery>
-                                                    <img src="../images/buffet/<?php echo $buffet_image['image_path']; ?>" alt="Banana">
-                                            </a>
-                                            <?php } ?>                                                                                     
+                                                <div class="gall-img">
+                                                <a href="../images/buffet/<?php echo $buffet_image['image_path']; ?>" title="" data-gallery>
+                                                    <img src="../images/buffet/<?php echo $buffet_image['image_path']; ?>" alt="">
+                                                </a> <br />
+                                                <button style="margin-top: 5px;" onclick="deleteImage('<?php echo $buffet_image['menu_id'] ?>','buffet')">Delete</button>
+                                                </div>
+                                            <?php } ?>  
+                                                <div style="clear: both">
                                             </div>
                                             <label>Bar</label> <input name="bar_menu[]" type="file" multiple="multiple">
                                             <div id="links" >
@@ -687,10 +722,14 @@ foreach($details as $detail) {
                                             $bar_images_arr = $adminObj->getMenu($hotel_id,"3");
                                             foreach($bar_images_arr as $bar_image) {
                                             ?>
-                                                <a href="../images/bar/<?php echo $bar_image['image_path']; ?>" title="Banana" data-gallery>
-                                                <img src="../images/bar/<?php echo $bar_image['image_path']; ?>" alt="Banana">
-                                            </a>
-                                            <?php } ?>                                                                                     
+                                                <div class="gall-img">
+                                                    <a href="../images/bar/<?php echo $bar_image['image_path']; ?>" title="" data-gallery />
+                                                    <img src="../images/bar/<?php echo $bar_image['image_path']; ?>" alt="" />
+                                                    </a> <br />
+                                                    <button style="margin-top: 5px;" onclick="deleteImage('<?php echo $bar_image['menu_id'] ?>','bar')">Delete</button>                                                                                                    
+                                                </div>
+                                            <?php } ?>
+                                                <div style="clear: both">
                                         </div>
                                         </div>
                                         
@@ -709,10 +748,14 @@ foreach($details as $detail) {
                                             $gallery_images_arr = $adminObj->getGallery($hotel_id);
                                             foreach($gallery_images_arr as $gallery_image) {
                                             ?>
-                                            <a href="../images/gallery/<?php echo $gallery_image['image_path']; ?>" title="Banana" data-gallery>
-                                                <img src="../images/gallery/<?php echo $gallery_image['image_path']; ?>" alt="Banana">
-                                            </a>
-                                            <?php } ?>                                                                                     
+                                            <div class="gall-img">
+                                            <a href="../images/gallery/<?php echo $gallery_image['image_path']; ?>" title="" data-gallery>
+                                                <img src="../images/gallery/<?php echo $gallery_image['image_path']; ?>" alt="">
+                                            </a> <br />
+                                            <button style="margin-top: 5px;" onclick="deleteImage('<?php echo $gallery_image['gallery_id'] ?>','gallery')">Delete</button>  
+                                            </div>
+                                            <?php } ?>
+                                            <div style="clear: both">
                                         </div>
                                         <input type="hidden" name="hotel_id" value="<?php echo $hotel_id ?>" />
                                         <input type="hidden" name="form_submit" value="1" />                                        
@@ -777,6 +820,7 @@ foreach($details as $detail) {
 
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
+    <script type="text/javascript" src="../js/bootstrap-timepicker.js"></script>
     <script src="//blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js"></script>
     <script src="../js/bootstrap-image-gallery.min.js"></script>
     <script>
@@ -790,6 +834,32 @@ foreach($details as $detail) {
             blueimp.Gallery($('#links a'), $('#blueimp-gallery').data());
         });
     </script>
+    <script type="text/javascript">
+            $('#opening_time').timepicker({
+                template: false,
+                showInputs: false,
+                minuteStep: 5
+            });
+            
+            $('#closing_time').timepicker({
+                template: false,
+                showInputs: false,
+                minuteStep: 5
+            });
+            
+            function deleteImage(image_id,image_type)
+            {
+                
+                $.ajax({
+                    method: "POST",
+                    url: "ajax.php",
+                    data: { image_id: image_id, image_type: image_type }
+                  })
+                    .done(function( msg ) {
+                      //alert( "Data Saved: " + msg );
+                    });
+            }
+        </script>
     <?php
     foreach($script as $display) {
         echo $display;

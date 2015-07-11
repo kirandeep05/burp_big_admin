@@ -490,7 +490,7 @@ if(isset($_POST['form_submit'])) {
                                         
                                         <div class="form-group">
                                             <label>Closing Time</label>
-                                            <input required="required" name="closing_time" class="form-control">
+                                            <input required="required" name="closing_time" id="closing_time" class="form-control">
                                         </div>
                                         
                                         <div class="form-group">
@@ -543,13 +543,28 @@ if(isset($_POST['form_submit'])) {
     <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
 
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>   
+    <script src="../dist/js/sb-admin-2.js"></script>  
+    <script type="text/javascript" src="../js/bootstrap-timepicker.js"></script>
     <script>
         function displayMenuSel(id)
         {
             $('#'+id).toggle();
         }
     </script>
+    
+    <script type="text/javascript">
+            $('#opening_time').timepicker({
+                template: false,
+                showInputs: false,
+                minuteStep: 5
+            });
+            
+            $('#closing_time').timepicker({
+                template: false,
+                showInputs: false,
+                minuteStep: 5
+            });
+        </script>
 </body>
 
 </html>

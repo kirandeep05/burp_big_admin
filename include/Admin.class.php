@@ -183,6 +183,31 @@ class Admin {
         return $id;
     }
     
+     public function getBanquetImage($hotel_id) {
+
+        $query = "SELECT `banquet_id`, `image_path` FROM `bb_banquet` WHERE `hotel_id` = :hotel_id";
+
+        $qh = $this->con->getQueryHandler($query, array("hotel_id"=>$hotel_id));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res;
+        }
+
+        return $data;
+    }
+    
+    public function deleteBanquetImage($id) {
+
+        $query = "DELETE FROM `bb_banquet` WHERE `banquet_id` = :banquet_id";
+
+        $bindParams = array("banquet_id" => $id);
+
+        $id = $this->con->insertQuery($query, $bindParams);
+
+        return $id;
+    }
+    
+    
     public function insertHotelDetails($hotel_id, $hotel_field_id, $hotel_field_val) {
 
         $query = "INSERT INTO `bb_hotel_details`(`hotel_id`, `hotel_field_id`, `hotel_field_val`, `active`) "
@@ -239,6 +264,28 @@ class Admin {
         $query = "INSERT INTO `bb_cuisine`(`name`) VALUES (:name)";
 
         $bindParams = array("name" => $name);
+
+        $id = $this->con->insertQuery($query, $bindParams);
+
+        return $id;
+    }
+    
+    public function deleteGallery($id) {
+
+        $query = "DELETE FROM `bb_gallery` WHERE `gallery_id` = :gallery_id";
+
+        $bindParams = array("gallery_id" => $id);
+
+        $id = $this->con->insertQuery($query, $bindParams);
+
+        return $id;
+    }
+    
+    public function deleteMenuImage($id, $menu_type) {
+
+        $query = "DELETE FROM `bb_hotel_menu` WHERE `menu_id` = :menu_id AND `menu_type` = :menu_type";
+
+        $bindParams = array("menu_id" => $id,"menu_type" => $menu_type);
 
         $id = $this->con->insertQuery($query, $bindParams);
 

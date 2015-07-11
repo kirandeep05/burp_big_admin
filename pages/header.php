@@ -28,10 +28,16 @@ if(!isset($_SESSION['logged'])) {
     <!--<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">-->
     <link rel="stylesheet" href="//blueimp.github.io/Gallery/css/blueimp-gallery.min.css">
     <link rel="stylesheet" href="../dist/css/bootstrap-image-gallery.min.css">
+    <link href="../dist/css/bootstrap-timepicker.min.css" type="text/css" rel="stylesheet" />
     <style>
         #links img {
-            height: 50px;
-            width: 50px;
+            height: 60px;
+            width: 60px;
+        }
+        
+        .gall-img {
+            float: left; 
+            margin: 9px 9px 9px 9px;
         }
     </style>
     <!-- Custom Fonts -->
