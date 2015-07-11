@@ -16,4 +16,6 @@ if($image_type == "gallery") {
     $adminObj->deleteMenuImage($image_id, "3");
 } else if($image_type == "banquet") {
     $adminObj->deleteBanquetImage($image_id);
+} else if($image_type == "hotel") {
+    $adminObj->deleteBanquetImage($image_id);
 }

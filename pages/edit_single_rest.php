@@ -37,6 +37,7 @@ if(isset($_POST['form_submit'])) {
     $banquet_images = $_FILES['banquet_image'];
     $gallery_images = $_FILES['gallery'];
     $cover_pic = $_FILES['cover_pic'];
+    $zip_code = isset($_POST['zip_code'])?$_POST['zip_code']:"";  
     
     $field_id[] = "2";
     $field_id[] = "3";
@@ -59,6 +60,7 @@ if(isset($_POST['form_submit'])) {
     $field_id[] = "20";
     $field_id[] = "21";
     $field_id[] = "22";
+    $field_id[] = "23";
     
     $field_val[] = $rest_desc;
     $field_val[] = $type;
@@ -81,6 +83,7 @@ if(isset($_POST['form_submit'])) {
     $field_val[] = $delivery;
     $field_val[] = $value_for_2;
     $field_val[] = $cover_pic;
+    $field_val[] = $zip_code;
     //var_dump($field_val);
     
 //    if($rest_name != "") {
@@ -229,23 +232,6 @@ foreach($details as $detail) {
         $rest_desc = $detail['hotel_field_val'];
     } else if($detail['hotel_field_id'] == 3) {
         $type = $detail['hotel_field_val'];
-        if($type == "Dhaba") {
-            $dhaba_checked = "checked";
-        } else if($type == "Casual Dining") {
-            $cas_checked = "checked";
-        } else if($type == "Fine Dining") {
-            $fine_checked = "checked";
-        } else if($type == "Cafe") {
-            $cafe_checked = "checked";
-        } else if ($type == "Rapid Munch") {
-            $rapid_checked = "checked";
-        } else if ($type == "Night Club") {
-            $club_checked = "checked";
-        } else if ($type == "Dessert Parlor") {
-            $des_checked = "checked";
-        } else if ($type == "Pub") {
-            $pub_checked = "checked";
-        }
     } else if($detail['hotel_field_id'] == 4) {
         $address = $detail['hotel_field_val'];
     } else if($detail['hotel_field_id'] == 5) {
@@ -398,46 +384,22 @@ foreach($details as $detail) {
                                         
                                         <div class="form-group">
                                             <label>Type</label>
+                                            <?php 
+                                                $typelist = $adminObj->getEstablishmentType();
+                                                foreach($typelist as $type_temp) {
+                                                    if($type == $type_temp['est_id']) {
+                                                        $checked_temp = "checked";
+                                                    } else {
+                                                        $checked_temp = "";
+                                                    }
+                                            ?>
                                             <div class="radio">
                                                 <label>
-                                                    <input type="radio" name="type" id="optionsRadios1" value="Casual Dining" <?php echo $cas_checked; ?> >Casual Dining
+                                                    <input type="radio" name="type" id="optionsRadios1" <?php echo $checked_temp; ?> value="<?php echo $type_temp['est_id'] ?>" ><?php echo $type_temp['est_name'] ?>
                                                 </label>
                                             </div>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="type" id="optionsRadios1" value="Fine Dining" <?php echo $fine_checked; ?>>Fine Dining
-                                                </label>
-                                            </div>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="type" id="optionsRadios2" value="Cafe" <?php echo $cafe_checked; ?>>Cafe
-                                                </label>
-                                            </div>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="type" id="optionsRadios2" value="Dhaba" <?php echo $dhaba_checked; ?>>Dhaba
-                                                </label>
-                                            </div>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="type" id="optionsRadios2" value="Rapid Munch" <?php echo $rapid_checked; ?>>Rapid Munch
-                                                </label>
-                                            </div>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="type" id="optionsRadios2" value="Night Club" <?php echo $club_checked; ?>>Night Club
-                                                </label>
-                                            </div>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="type" id="optionsRadios2" value="Dessert Parlor" <?php echo $des_checked; ?>>Dessert Parlor
-                                                </label>
-                                            </div>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="type" id="optionsRadios2" value="Pub" <?php echo $pub_checked; ?>>Pub
-                                                </label>
-                                            </div>
+                                            
+                                                <?php } ?>
                                             <input class="form-control" name="hotel_name" required="required" placeholder="Enter Restaurant/Cafe/Dhaba name" value="<?php echo $rest_name ?>">
                                             <p class="help-block">Example "Chawla".</p>
                                         </div>
@@ -472,6 +434,11 @@ foreach($details as $detail) {
                                                 <option value="Chandigarh">Chandigarh</option>
                                                 <option value="Delhi">Delhi</option>
                                             </select>
+                                        </div>
+                                        
+                                         <div class="form-group">
+                                            <label>Zip Code</label>
+                                            <input class="form-control" name="zip_code" required="required" placeholder="Zip Code">                                            
                                         </div>
                                         
                                         <div class="form-group">

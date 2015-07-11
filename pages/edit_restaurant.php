@@ -36,6 +36,7 @@ $adminObj = new Admin();
                                             <th>Hotel Name</th>
                                             <th>Edit</th>
                                             <th>Active</th>
+                                            <!-- <th>Suspend</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -54,6 +55,7 @@ $adminObj = new Admin();
                                             <td><?php echo $rest_arr['hotel_name'] ?></td>
                                             <td><button onclick="location.href='edit_single_rest.php?hotel_id=<?php echo $rest_arr['hotel_id'] ?>'">Edit</button></td>
                                             <td class="center"><?php echo $rest_arr['active'] ?></td>
+                                           <!-- <td class="center"><button onclick="">Suspend</button></td> -->
                                         </tr>
                                      <?php } ?>
                                     </tbody>
@@ -97,6 +99,18 @@ $adminObj = new Admin();
                 responsive: true
         });
     });
+    
+    function deleteImage(image_id,image_type)
+    {
+        $.ajax({
+            method: "POST",
+            url: "ajax.php",
+            data: { image_id: image_id, image_type: image_type }
+          })
+            .done(function( msg ) {
+              //alert( "Data Saved: " + msg );
+            });
+    }
     </script>
 
 </body>

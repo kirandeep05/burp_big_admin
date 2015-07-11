@@ -36,6 +36,7 @@ if(isset($_POST['form_submit'])) {
     $banquet_images = $_FILES['banquet_image'];
     $gallery_images = $_FILES['gallery'];
     $cover_pic = $_FILES['cover_pic'];
+    $zip_code = isset($_POST['zip_code'])?$_POST['zip_code']:"";  
     
     
     $field_id[] = "2";
@@ -59,6 +60,7 @@ if(isset($_POST['form_submit'])) {
     $field_id[] = "20";
     $field_id[] = "21";
     $field_id[] = "22";
+    $field_id[] = "23";
     
     $field_val[] = $rest_desc;
     $field_val[] = $type;
@@ -81,7 +83,7 @@ if(isset($_POST['form_submit'])) {
     $field_val[] = $delivery;
     $field_val[] = $value_for_2;
     $field_val[] = $cover_pic;
-    //var_dump($field_val);
+    $field_val[] = $zip_code;
     
     $rest_id = $_POST['hotel_id'];
     $check_hotel = $adminObj->checkHotel($hotel_name);
@@ -246,46 +248,17 @@ if(isset($_POST['form_submit'])) {
                                         
                                         <div class="form-group">
                                             <label>Type</label>
+                                            <?php 
+                                                $typelist = $adminObj->getEstablishmentType();
+                                                foreach($typelist as $type_temp) { 
+                                            ?>
                                             <div class="radio">
                                                 <label>
-                                                    <input type="radio" name="type" id="optionsRadios1" value="Casual Dining" checked>Casual Dining
+                                                    <input type="radio" name="type" id="optionsRadios1" value="<?php echo $type_temp['est_id'] ?>" ><?php echo $type_temp['est_name'] ?>
                                                 </label>
                                             </div>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="type" id="optionsRadios1" value="Fine Dining" checked>Fine Dining
-                                                </label>
-                                            </div>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="type" id="optionsRadios2" value="Cafe">Cafe
-                                                </label>
-                                            </div>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="type" id="optionsRadios2" value="Dhaba">Dhaba
-                                                </label>
-                                            </div>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="type" id="optionsRadios2" value="Rapid Munch">Rapid Munch
-                                                </label>
-                                            </div>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="type" id="optionsRadios2" value="Night Club">Night Club
-                                                </label>
-                                            </div>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="type" id="optionsRadios2" value="Dessert Parlor">Dessert Parlor
-                                                </label>
-                                            </div>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="type" id="optionsRadios2" value="Pub">Pub
-                                                </label>
-                                            </div>
+                                            
+                                                <?php } ?>
                                             <input class="form-control" name="hotel_name" required="required" placeholder="Enter Restaurant/Cafe/Dhaba name">
                                             <p class="help-block">Example "Chawla".</p>
                                         </div>
@@ -306,6 +279,11 @@ if(isset($_POST['form_submit'])) {
                                         <div class="form-group">
                                             <label>Address</label>
                                             <textarea class="form-control" name="address" required="required" placeholder="Enter Complete Address here" rows="3"></textarea>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Zip Code</label>
+                                            <input class="form-control" name="zip_code" required="required" placeholder="Zip Code">                                            
                                         </div>
                                         
                                         <div class="form-group">

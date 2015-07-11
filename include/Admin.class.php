@@ -28,6 +28,19 @@ class Admin {
         return $data;
     }
     
+    public function getEstablishmentType($active = "1") {
+
+        $query = "SELECT `est_id`, `est_name` FROM `bb_establishment_type` WHERE `est_active` = :active";
+
+        $qh = $this->con->getQueryHandler($query, array("active" => $active));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res;
+        }
+
+        return $data;
+    }
+    
     public function getMenuSelection($type_id, $hotel_id) {
 
         $query = "SELECT `breakfast`, `lunch`, `dinner` FROM `bb_menu_selection` WHERE `type_id` = :type_id AND `hotel_id` = :hotel_id";
@@ -61,6 +74,18 @@ class Admin {
 
         $qh = $this->con->getQueryHandler($query, array("hotel_id" => $hotel_id));
         return $qh->fetch(PDO::FETCH_ASSOC);
+    }
+    
+    public function getHotelsList() {
+
+        $query = "SELECT `hotel_id`, `hotel_name`, `rest_id` FROM `bb_hotel`";
+
+        $qh = $this->con->getQueryHandler($query, array());
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res;
+        }
+
+        return $data;
     }
     
     public function checkHotel($name) {
@@ -131,6 +156,17 @@ class Admin {
         $query = "UPDATE `bb_hotel` SET `hotel_name` = :hotel_name, `updated_date`= NOW() WHERE `hotel_id` = :hotel_id";
 
         $bindParams = array("hotel_name" => $name,"hotel_id"=>$hotel_id);
+
+        $id = $this->con->insertQuery($query, $bindParams);
+
+        return $id;
+    }
+    
+    public function deactivateHotel($hotel_id,$active) {
+
+        $query = "UPDATE `bb_hotel` SET `active` = :active, `updated_date`= NOW() WHERE `hotel_id` = :hotel_id";
+
+        $bindParams = array("active" => $active,"hotel_id"=>$hotel_id);
 
         $id = $this->con->insertQuery($query, $bindParams);
 
@@ -372,5 +408,15 @@ class Admin {
         return $data;
     }
 
-    
+    public function insertAdvertisement($hotel_id,$cover_pic,$start_date,$end_date) {
+
+        $query = "INSERT INTO `bb_advertisement`(`ad_hotel_id`, `ad_cover_pic`, `ad_start_date`, `ad_end_date`) "
+                . "VALUES (:hotel_id,:cover_pic,:start_date,:end_date)";
+
+        $bindParams = array("hotel_id" => $hotel_id,"cover_pic"=>$cover_pic,"start_date"=>$start_date,"end_date"=>$end_date);
+
+        $id = $this->con->insertQuery($query, $bindParams);
+
+        return $id;
+    }
 }
