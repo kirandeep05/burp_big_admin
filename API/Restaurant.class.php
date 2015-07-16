@@ -75,7 +75,35 @@ class Restaurant {
         return $data;
     }
     
+    public function getSingleRestDetail($hotel_id) {
+
+        $query = "SELECT `field_name`, `hotel_field_val`,`hotel_name` FROM `bb_hotel_details` hd,`bb_hotel_fields` hf,`bb_hotel` hh "
+                . "WHERE `hotel_field_id` = `field_id` "
+                . "AND hh.`hotel_id` = 8 AND "
+                . "hh.`hotel_id` = hd.`hotel_id`";
+
+        $qh = $this->con->getQueryHandler($query, array("hotel_id" => $hotel_id));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[$res['field_name']] = $res['hotel_field_val'];
+            $data['hotel_name'] = $res['hotel_name'];
+        }
+
+        return $data;
+    }
     
+    public function getCuisineFromID($id) {
+
+        $query = "SELECT `name` FROM `bb_cuisine` WHERE `id` IN ($id)";
+
+        $qh = $this->con->getQueryHandler($query, array());
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res;
+        }
+
+        return $data;
+    }
 
     
 }

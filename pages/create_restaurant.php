@@ -47,6 +47,7 @@ if(isset($_POST['form_submit'])) {
         $hh_opening_time = "";
         $hh_closing_time = "";
     }
+    $takeaway = isset($_POST['takeaway'])?$_POST['takeaway']:"no";
     
     $field_id[] = "2";
     $field_id[] = "3";
@@ -75,6 +76,7 @@ if(isset($_POST['form_submit'])) {
     $field_id[] = "26";
     $field_id[] = "27";
     $field_id[] = "28";
+    $field_id[] = "29";
     
     $field_val[] = $rest_desc;
     $field_val[] = $type;
@@ -103,6 +105,7 @@ if(isset($_POST['form_submit'])) {
     $field_val[] = $airconditioned;
     $field_val[] = $hh_opening_time;
     $field_val[] = $hh_closing_time;
+    $field_val[] = $takeaway;
     
     $rest_id = $_POST['hotel_id'];
     $check_hotel = $adminObj->checkHotel($hotel_name);
@@ -395,6 +398,20 @@ if(isset($_POST['form_submit'])) {
                                             <div class="radio">
                                                 <label>
                                                     <input type="radio" name="alcohol" id="optionsRadios2" value="no" checked>No
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Take away</label>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="takeaway" id="optionsRadios1" value="yes">Yes
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="takeaway" id="optionsRadios2" value="no" checked>No
                                                 </label>
                                             </div>
                                         </div>

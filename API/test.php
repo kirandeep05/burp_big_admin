@@ -37,6 +37,16 @@ and open the template in the editor.
             </table>
         </fieldset>
         </form>
+        
+        <form action="index.php" method="post">
+        <fieldset>
+            <legend>Get Single Rest</legend>
+            <table>
+                <tr><td><input type="text" name="hotel_id" /></td></tr>
+                <tr><td><input type="hidden" name="type" value="get_single_rest" /><input type="submit" value="Get" /></td></tr>
+            </table>
+        </fieldset>
+        </form>
        
     </body>
 </html>

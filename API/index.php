@@ -43,6 +43,49 @@ switch ($type) {
         echo str_replace("\/", "/", json_encode(array("cities"=>$cities )));
 
     break;
+
+    case "get_single_rest":            
+        $hotel_id = isset($_POST['hotel_id'])?$_POST['hotel_id']:"0";
+        $rest_detail = $restObj->getSingleRestDetail($hotel_id);
+        //var_dump($rest_detail);
+        $data['hotel_name'] = $rest_detail['hotel_name'];
+        $data['cuisines'] = $restObj->getCuisineFromID($rest_detail['Cuisine']);
+        $data['opening_time'] = $rest_detail['Opening Time'];
+        $data['closing_time'] = $rest_detail['Closing Time'];
+        $data['visitor_attraction'] = $rest_detail['Visitor Attraction'];
+        $data['value_for_2'] = $rest_detail['Value for 2'];
+        $data['address'] = $rest_detail['Address'];
+        $data['main_phone'] = $rest_detail['Main Phone'];        
+        $data['alt_phone'] = $rest_detail['Alternate Phone'];
+        
+        $available = array();
+        $not_available = array();
+        //$check = array($rest_detail['Alcohol'],$rest_detail['Banquet'],$rest_detail['Delivery'],$rest_detail['Take Away'], $rest_detail['Wifi'], $rest_detail['Air Conditioned']);
+        foreach($rest_detail as $key => $value) {
+            if(strtolower($value) == "yes") {
+                $available[] = $key;
+            } else {
+                $not_availble[] = $key;
+            }
+        }
+        $serves_arr = explode(",",$rest_detail['Serves']);
+        if(count($serves_arr) < 1) {
+            if($serves_arr[0] == "Veg") {
+                $available[] = "Vegetarian";
+                $not_available[] = "Non-Vegetarian";
+            } else {
+                $available[] = "Non-Vegetarian";
+                $not_available[] = "Vegetarian";
+            }
+        } else {
+            $available[] = "Non-Vegetarian";
+            $available[] = "Vegetarian";
+        }
+        $data['available'] = $available;
+        $data['not_available'] = $not_available;
+        echo str_replace("\/", "/", json_encode($data));
+
+    break;
         
     default: 
         echo "Default";

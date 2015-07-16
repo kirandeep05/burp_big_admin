@@ -356,6 +356,16 @@ class Admin {
         return $id;
     }
     
+    public function getHotelDetailsID($hotel_id,$hotel_field_id) {
+
+        $query = "SELECT COUNT(*) as total FROM `bb_hotel_details` WHERE `hotel_field_id` = :hotel_field_id AND `hotel_id` = :hotel_id";
+
+        $qh = $this->con->getQueryHandler($query, array("hotel_field_id"=>$hotel_field_id,"hotel_id"=>$hotel_id));
+        $res = $qh->fetch(PDO::FETCH_ASSOC);
+            
+        return ($res['total'] > 0)?true:false;
+    }
+    
     public function insertGallery($image_path, $hotel_id) {
 
         $query = "INSERT INTO `bb_gallery`(`image_path`, `hotel_id`) VALUES (:image_path,:hotel_id)";

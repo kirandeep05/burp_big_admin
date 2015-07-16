@@ -49,6 +49,7 @@ if(isset($_POST['form_submit'])) {
         $hh_opening_time = "";
         $hh_closing_time = "";
     }
+    $takeaway = isset($_POST['takeaway'])?$_POST['takeaway']:"no";
     
     $field_id[] = "2";
     $field_id[] = "3";
@@ -77,6 +78,7 @@ if(isset($_POST['form_submit'])) {
     $field_id[] = "26";
     $field_id[] = "27";
     $field_id[] = "28";
+    $field_id[] = "29";
     
     $field_val[] = $rest_desc;
     $field_val[] = $type;
@@ -105,6 +107,7 @@ if(isset($_POST['form_submit'])) {
     $field_val[] = $airconditioned;
     $field_val[] = $hh_opening_time;
     $field_val[] = $hh_closing_time;
+    $field_val[] = $takeaway;
     //var_dump($field_val);
     
 //    if($rest_name != "") {
@@ -118,11 +121,20 @@ if(isset($_POST['form_submit'])) {
                 $adminObj->updateHotel($hotel_name, $hotel_id,$rest_id);                
                 for($i=0;$i<count($field_id);$i++) {
                     //var_dump(array($hotel_id, $field_id[$i], $field_val[$i]));
-                    if($field_id[$i] == "22") {
-                        $ac_image_path = $adminObj->uploadFile($field_val[$i], "cover_pic");
-                        $adminObj->updateHotelDetails($hotel_id, $field_id[$i], $ac_image_path);
+                    if($adminObj->getHotelDetailsID($hotel_id, $field_id[$i])) {
+                        if($field_id[$i] == "22") {
+                            $ac_image_path = $adminObj->uploadFile($field_val[$i], "cover_pic");
+                            $adminObj->updateHotelDetails($hotel_id, $field_id[$i], $ac_image_path);
+                        } else {
+                            $adminObj->updateHotelDetails($hotel_id, $field_id[$i], $field_val[$i]);
+                        }
                     } else {
-                        $adminObj->updateHotelDetails($hotel_id, $field_id[$i], $field_val[$i]);
+                        if($field_id[$i] == "22") {
+                            $ac_image_path = $adminObj->uploadFile($field_val[$i], "cover_pic");
+                            $adminObj->insertHotelDetails($hotel_id, $field_id[$i], $ac_image_path);
+                         } else {
+                            $adminObj->insertHotelDetails($hotel_id, $field_id[$i], $field_val[$i]);
+                         }
                     }
                 }
                 if(!(count($alacarte_menu['name']) == 1 && $alacarte_menu['name'][0] == '')) {
@@ -245,7 +257,7 @@ $hotel_name = $rest_name_arr['hotel_name'];
 $rest_name = $rest_name_arr['rest_name'];
 $details = $adminObj->getHotelDetails($hotel_id);
 $seating_arr = array();
-$hh_yes_checked = $visitor_attraction = $cover_pic_data = $value_for_2 = $zip_code_data = $hh_no_checked = $wifi_yes_checked = $wifi_no_checked = $airconditioned_data = $ac_yes_checked = $ac_no_checked = $hh_opening_time_data = $hh_closing_time_data = $dhaba_checked = $rest_checked = $cafe_checked = $club_checked = $des_checked = $pub_checked = $cas_checked = $fine_checked = $veg_checked = $nonveg_checked = $alcohol_yes = $alcohol_no = $dine_checked = $roof_checked = $lounge_checked = $bar_checked = $rapid_checked = $outdoor_checked = $alacarte_check = $buffet_check = $al_bf_check = $al_lunch_check = $al_dinner_check = $buffet_bf_check = $buffet_lunch_check = $buffet_dinner_check = $banquet_yes_check = $banquet_no_check = $delivery_yes = $delivery_no = "";
+$hh_yes_checked = $ta_yes_checked = $ta_no_checked = $visitor_attraction = $cover_pic_data = $value_for_2 = $zip_code_data = $hh_no_checked = $wifi_yes_checked = $wifi_no_checked = $airconditioned_data = $ac_yes_checked = $ac_no_checked = $hh_opening_time_data = $hh_closing_time_data = $dhaba_checked = $rest_checked = $cafe_checked = $club_checked = $des_checked = $pub_checked = $cas_checked = $fine_checked = $veg_checked = $nonveg_checked = $alcohol_yes = $alcohol_no = $dine_checked = $roof_checked = $lounge_checked = $bar_checked = $rapid_checked = $outdoor_checked = $alacarte_check = $buffet_check = $al_bf_check = $al_lunch_check = $al_dinner_check = $buffet_bf_check = $buffet_lunch_check = $buffet_dinner_check = $banquet_yes_check = $banquet_no_check = $delivery_yes = $delivery_no = "";
 foreach($details as $detail) {
     if($detail['hotel_field_id'] == 2) {
         $rest_desc = $detail['hotel_field_val'];
@@ -370,6 +382,13 @@ foreach($details as $detail) {
         $hh_opening_time_data = $detail['hotel_field_val'];
     } else if($detail['hotel_field_id'] == 28) {
         $hh_closing_time_data = $detail['hotel_field_val'];
+    } else if($detail['hotel_field_id'] == 29) {
+        $takeaway_data = $detail['hotel_field_val'];
+        if($takeaway_data == "yes"){
+            $ta_yes_checked = "checked";
+        } else {
+            $ta_no_checked = "checked";
+        }
     }
 } 
 
@@ -576,6 +595,20 @@ foreach($details as $detail) {
                                             <div class="radio">
                                                 <label>
                                                     <input type="radio" name="alcohol" id="optionsRadios2" value="no" <?php echo $alcohol_no; ?>>No
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Take away</label>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="takeaway" id="optionsRadios1" value="yes" <?php echo $ta_yes_checked; ?>>Yes
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="takeaway" id="optionsRadios2" value="no" <?php echo $ta_no_checked; ?> >No
                                                 </label>
                                             </div>
                                         </div>
