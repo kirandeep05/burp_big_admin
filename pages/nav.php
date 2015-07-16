@@ -242,13 +242,23 @@
                             <a href="create_hotel.php"><i class="fa fa-table fa-fw"></i> Create Hotel</a>
                         </li>
                         <li>
-                            <a href="create_restaurant.php"><i class="fa fa-table fa-fw"></i> Create Restaurant</a>
+                            <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Restaurant<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="create_restaurant.php"><i class="fa fa-table fa-fw"></i> Create Restaurant</a>
+                                </li>
+                                <li>
+                                    <a href="edit_restaurant.php"><i class="fa fa-table fa-fw"></i> Edit Restaurant</a>
+                                </li>
+                            </ul>
+                            <!-- /.nav-second-level -->
                         </li>
-                        <li>
-                            <a href="edit_restaurant.php"><i class="fa fa-table fa-fw"></i> Edit Restaurant</a>
-                        </li>
+                        
                         <li>
                             <a href="add_cuisines.php"><i class="fa fa-table fa-fw"></i> Add Cuisines</a>
+                        </li>
+                        <li>
+                            <a href="add_advertisement.php"><i class="fa fa-table fa-fw"></i> Add Advertisement</a>
                         </li>
                     </ul>
                 </div>
