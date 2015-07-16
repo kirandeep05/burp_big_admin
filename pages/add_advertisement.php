@@ -5,17 +5,23 @@ include '../include/Connection.class.php';
 include '../include/Admin.class.php';
 include './header.php'; 
 $adminObj = new Admin();
-
+$error = "";
 if(isset($_POST['form_submit'])) {
     
     $hotel_id = isset($_POST['hotel_id'])?$_POST['hotel_id']:"";   
-    $type = isset($_POST['type'])?$_POST['type']:"";   
+    $type_id = isset($_POST['type'])?$_POST['type']:"";   
     $start_date = isset($_POST['start_date'])?$_POST['start_date']:"";   
     $end_date = isset($_POST['end_date'])?$_POST['end_date']:"";   
     $cover_pic = $_FILES['cover_pic'];
-    $cover_pic_image_path = $adminObj->uploadFile($cover_pic, "advertisement");
-    if($cover_pic_image_path != "-1") {
-        $adminObj->insertAdvertisement($hotel_id, $cover_pic_image_path, $start_date, $end_date);
+    if($adminObj->checkHotelInAd($hotel_id, $type_id)) {
+        $cover_pic_image_path = $adminObj->uploadFile($cover_pic, "advertisement");
+        if($cover_pic_image_path != "-1"  || $cover_pic_image_path == "") {
+            $adminObj->insertAdvertisement($hotel_id, $cover_pic_image_path,$type_id, $start_date, $end_date);
+        } else {
+            $error = "Image cannot be uploaded. Please try again !";
+        }
+    } else {
+        $error = "Hotel already exists";
     }
 }
 
@@ -43,6 +49,11 @@ if(isset($_POST['form_submit'])) {
                             Add Advertisement
                         </div>
                         <div class="panel-body">
+                            <?php if($error != "") {?>
+                            <div class="alert alert-danger">
+                             <?php echo $error; ?>
+                            </div>
+                            <?php } ?>
                             <div class="row">
                                 <div class="col-lg-6">
                                     <form role="form" action="add_advertisement.php" method="post" enctype="multipart/form-data">
@@ -53,23 +64,23 @@ if(isset($_POST['form_submit'])) {
                                                 $hotellist = $adminObj->getHotelsList(); 
                                                 foreach($hotellist as $hotels) {
                                                 ?>
-                                                <option value="<?php echo $hotels['hotel_id']; ?>"><?php echo $hotels['hotel_name']; ?></option>
+                                                <option value="<?php echo $hotels['hotel_id']; ?>"><?php echo $hotels['hotel_name']." - ".$hotels['rest_name']; ?></option>
                                                 <?php } ?>
                                             </select>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label>Type</label>
+                                            <?php 
+                                                $adv_type_arr = $adminObj->getAdvType();
+                                                foreach($adv_type_arr as $adv_type) {
+                                            ?>
                                             <div class="radio">
                                                 <label>
-                                                    <input type="radio" name="type" id="optionsRadios1" value="Trending" checked>Trending
+                                                    <input type="radio" name="type" id="optionsRadios1" value="<?php echo $adv_type['ad_type_id'] ?>" checked><?php echo $adv_type['ad_type_name']; ?>
                                                 </label>
                                             </div>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="type" id="optionsRadios1" value="Sponsored">Sponsored
-                                                </label>
-                                            </div>
+                                                <?php } ?>                                            
                                         </div>
                                         
                                         

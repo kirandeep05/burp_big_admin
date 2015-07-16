@@ -4,10 +4,11 @@ ini_set('display_errors', 'On');
 include '../include/Connection.class.php';
 include '../include/Admin.class.php';
 include './header.php'; 
+$error = "";
 $adminObj = new Admin();
 $hotel_id = isset($_GET['hotel_id'])?$_GET['hotel_id']:(isset($_POST['hotel_id'])?$_POST['hotel_id']:"");
 if(isset($_POST['form_submit'])) {
-    $rest_name = isset($_POST['rest_name'])?$_POST['rest_name']:"";
+    $rest_id = isset($_POST['rest_id'])?$_POST['rest_id']:"";
     $hotel_name = isset($_POST['hotel_name'])?$_POST['hotel_name']:"";
     $rest_desc = isset($_POST['rest_desc'])?$_POST['rest_desc']:"";
     $type = isset($_POST['type'])?$_POST['type']:"";
@@ -18,10 +19,10 @@ if(isset($_POST['form_submit'])) {
     $country = isset($_POST['country'])?$_POST['country']:"";
     $phone_main = isset($_POST['main'])?$_POST['main']:"";
     $phone_alt = isset($_POST['alt'])?$_POST['alt']:"";
-    $cuisine = isset($_POST['cuisine'])?$_POST['cuisine']:"";
-    $serves = isset($_POST['serves'])?$_POST['serves']:"";
+    $cuisine = isset($_POST['cuisine'])?$_POST['cuisine']:array();
+    $serves = isset($_POST['serves'])?$_POST['serves']:array();
     $alcohol = isset($_POST['alcohol'])?$_POST['alcohol']:"";
-    $seating = isset($_POST['seating'])?$_POST['seating']:"";
+    $seating = isset($_POST['seating'])?$_POST['seating']:array();
     $menu_sel = isset($_POST['menu_sel'])?$_POST['menu_sel']:array();
     $alacarte_check = isset($_POST['alacarte_check'])?$_POST['alacarte_check']:array();
     $buffet_check = isset($_POST['buffet_check'])?$_POST['buffet_check']:array();
@@ -37,7 +38,17 @@ if(isset($_POST['form_submit'])) {
     $banquet_images = $_FILES['banquet_image'];
     $gallery_images = $_FILES['gallery'];
     $cover_pic = $_FILES['cover_pic'];
-    $zip_code = isset($_POST['zip_code'])?$_POST['zip_code']:"";  
+    $zip_code = isset($_POST['zip_code'])?$_POST['zip_code']:""; 
+    $happy_hours = isset($_POST['happy_hours'])?$_POST['happy_hours']:"";
+    $wifi = isset($_POST['wifi'])?$_POST['wifi']:"";
+    $airconditioned = isset($_POST['airconditioned'])?$_POST['airconditioned']:"";
+    if($happy_hours == "yes") {
+        $hh_opening_time = isset($_POST['hh_opening_time'])?$_POST['hh_opening_time']:"";
+        $hh_closing_time = isset($_POST['hh_closing_time'])?$_POST['hh_closing_time']:"";
+    } else {
+        $hh_opening_time = "";
+        $hh_closing_time = "";
+    }
     
     $field_id[] = "2";
     $field_id[] = "3";
@@ -61,6 +72,11 @@ if(isset($_POST['form_submit'])) {
     $field_id[] = "21";
     $field_id[] = "22";
     $field_id[] = "23";
+    $field_id[] = "24";
+    $field_id[] = "25";
+    $field_id[] = "26";
+    $field_id[] = "27";
+    $field_id[] = "28";
     
     $field_val[] = $rest_desc;
     $field_val[] = $type;
@@ -84,6 +100,11 @@ if(isset($_POST['form_submit'])) {
     $field_val[] = $value_for_2;
     $field_val[] = $cover_pic;
     $field_val[] = $zip_code;
+    $field_val[] = $happy_hours;
+    $field_val[] = $wifi;
+    $field_val[] = $airconditioned;
+    $field_val[] = $hh_opening_time;
+    $field_val[] = $hh_closing_time;
     //var_dump($field_val);
     
 //    if($rest_name != "") {
@@ -94,7 +115,7 @@ if(isset($_POST['form_submit'])) {
            //$check_hotel = $adminObj->checkHotel($hotel_name);
             $check_hotel = array();
            if(empty($check_hotel)) {
-                $adminObj->updateHotel($hotel_name, $hotel_id);                
+                $adminObj->updateHotel($hotel_name, $hotel_id,$rest_id);                
                 for($i=0;$i<count($field_id);$i++) {
                     //var_dump(array($hotel_id, $field_id[$i], $field_val[$i]));
                     if($field_id[$i] == "22") {
@@ -216,9 +237,6 @@ if(isset($_POST['form_submit'])) {
         } else {
             $error = "Restaurant name exists";
         }
-//    } else {
-//        $error = "Restaurant name cannot be empty";
-//    }
 }
 
 $script = array();
@@ -226,7 +244,8 @@ $rest_name_arr = $adminObj->getRestaurantName($hotel_id);
 $hotel_name = $rest_name_arr['hotel_name'];
 $rest_name = $rest_name_arr['rest_name'];
 $details = $adminObj->getHotelDetails($hotel_id);
-$dhaba_checked = $rest_checked = $cafe_checked = $club_checked = $des_checked = $pub_checked = $cas_checked = $fine_checked = $veg_checked = $nonveg_checked = $alcohol_yes = $alcohol_no = $dine_checked = $roof_checked = $lounge_checked = $bar_checked = $rapid_checked = $outdoor_checked = $alacarte_check = $buffet_check = $al_bf_check = $al_lunch_check = $al_dinner_check = $buffet_bf_check = $buffet_lunch_check = $buffet_dinner_check = $banquet_yes_check = $banquet_no_check = $delivery_yes = $delivery_no = "";
+$seating_arr = array();
+$hh_yes_checked = $visitor_attraction = $cover_pic_data = $value_for_2 = $zip_code_data = $hh_no_checked = $wifi_yes_checked = $wifi_no_checked = $airconditioned_data = $ac_yes_checked = $ac_no_checked = $hh_opening_time_data = $hh_closing_time_data = $dhaba_checked = $rest_checked = $cafe_checked = $club_checked = $des_checked = $pub_checked = $cas_checked = $fine_checked = $veg_checked = $nonveg_checked = $alcohol_yes = $alcohol_no = $dine_checked = $roof_checked = $lounge_checked = $bar_checked = $rapid_checked = $outdoor_checked = $alacarte_check = $buffet_check = $al_bf_check = $al_lunch_check = $al_dinner_check = $buffet_bf_check = $buffet_lunch_check = $buffet_dinner_check = $banquet_yes_check = $banquet_no_check = $delivery_yes = $delivery_no = "";
 foreach($details as $detail) {
     if($detail['hotel_field_id'] == 2) {
         $rest_desc = $detail['hotel_field_val'];
@@ -237,11 +256,11 @@ foreach($details as $detail) {
     } else if($detail['hotel_field_id'] == 5) {
         $area = $detail['hotel_field_val'];
     } else if($detail['hotel_field_id'] == 6) {
-        
+        $city_id = $detail['hotel_field_val'];
     } else if($detail['hotel_field_id'] == 7) {
-        
+        $state_id = $detail['hotel_field_val'];
     } else if($detail['hotel_field_id'] == 8) {
-        
+        $country_id = $detail['hotel_field_val'];
     } else if($detail['hotel_field_id'] == 9) {
         $main_phone = $detail['hotel_field_val'];
     } else if($detail['hotel_field_id'] == 10) {
@@ -263,20 +282,7 @@ foreach($details as $detail) {
             $alcohol_no = "checked";
         }
     } else if($detail['hotel_field_id'] == 13) {
-        $seating_arr = explode(",",$detail['hotel_field_val']);
-        foreach($seating_arr as $seating) {
-            if($seating == "Dining") {
-                $dine_checked = "checked";
-            } else if($seating == "Roof") {
-                $roof_checked = "checked";
-            } else if($seating == "Outdoor") {
-                $outdoor_checked = "checked";
-            } else if($seating == "Lounge") {
-                $lounge_checked = "checked";
-            } else if($seating == "Bar") {
-                $bar_checked = "checked";
-            }
-        }
+        $seating_arr = explode(",",$detail['hotel_field_val']);        
     } else if($detail['hotel_field_id'] == 14) {
         $menu_sel_arr = explode(",",$detail['hotel_field_val']);
         foreach($menu_sel_arr as $menu_sel) {
@@ -337,8 +343,37 @@ foreach($details as $detail) {
         $value_for_2 = $detail['hotel_field_val'];
     } else if($detail['hotel_field_id'] == 22) {
         $cover_pic_data = $detail['hotel_field_val'];
+    } else if($detail['hotel_field_id'] == 23) {
+        $zip_code_data = $detail['hotel_field_val'];
+    } else if($detail['hotel_field_id'] == 24) {
+        $happy_hours_data = $detail['hotel_field_val'];
+        if($happy_hours_data == "yes"){
+            $hh_yes_checked = "checked";
+        } else {
+            $hh_no_checked = "checked";
+        }
+    } else if($detail['hotel_field_id'] == 25) {
+        $wifi_data = $detail['hotel_field_val'];
+        if($wifi_data == "yes"){
+            $wifi_yes_checked = "checked";
+        } else {
+            $wifi_no_checked = "checked";
+        }
+    } else if($detail['hotel_field_id'] == 26) {
+        $airconditioned_data = $detail['hotel_field_val'];
+        if($airconditioned_data == "yes"){
+            $ac_yes_checked = "checked";
+        } else {
+            $ac_no_checked = "checked";
+        }
+    } else if($detail['hotel_field_id'] == 27) {
+        $hh_opening_time_data = $detail['hotel_field_val'];
+    } else if($detail['hotel_field_id'] == 28) {
+        $hh_closing_time_data = $detail['hotel_field_val'];
     }
 } 
+
+
 ?>
 
 <body>
@@ -362,12 +397,17 @@ foreach($details as $detail) {
                             Edit Restaurant
                         </div>
                         <div class="panel-body">
+                             <?php if($error != "") {?>
+                            <div class="alert alert-danger">
+                             <?php echo $error; ?>
+                            </div>
+                            <?php } ?>
                             <div class="row">
                                 <div class="col-lg-6">
                                     <form role="form" action="edit_single_rest.php" method="post" enctype="multipart/form-data">
                                         <div class="form-group">
                                             <label>Name of the Hotel</label>
-                                            <select  name="hotel_id" class="form-control">
+                                            <select  name="rest_id" class="form-control">
                                                 <?php 
                                                 $hotellist = $adminObj->getRestaurants(); 
                                                 foreach($hotellist as $hotels) {
@@ -400,19 +440,19 @@ foreach($details as $detail) {
                                             </div>
                                             
                                                 <?php } ?>
-                                            <input class="form-control" name="hotel_name" required="required" placeholder="Enter Restaurant/Cafe/Dhaba name" value="<?php echo $rest_name ?>">
+                                            <input class="form-control" name="hotel_name" required="required" placeholder="Enter Restaurant/Cafe/Dhaba name" value="<?php echo $hotel_name ?>">
                                             <p class="help-block">Example "Chawla".</p>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label>Description</label>
-                                            <input class="form-control" name="rest_desc" required="required" value="<?php echo $rest_desc ?>" placeholder="Description of Hotel">
+                                            <input class="form-control" name="rest_desc" value="<?php echo $rest_desc ?>" placeholder="Description of Hotel">
                                             <p class="help-block">Example "Bakery".</p>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label>Visitor Attraction</label>
-                                            <input class="form-control" name="rest_known_for" required="required" placeholder="What is the hotel known for ?" value="<?php echo $visitor_attraction ?>">
+                                            <input class="form-control" name="rest_known_for" placeholder="What is the hotel known for ?" value="<?php echo $visitor_attraction ?>">
                                             <p class="help-block">Example "The must-go-to place in Chandigarh for THE Butter Chicken experience!".</p>
                                         </div>
                                         
@@ -420,6 +460,11 @@ foreach($details as $detail) {
                                         <div class="form-group">
                                             <label>Address</label>
                                             <textarea class="form-control" name="address" required="required" placeholder="Enter Complete Address here" rows="3"><?php echo $address; ?></textarea>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Zip Code</label>
+                                            <input class="form-control" name="zip_code" required="required" placeholder="Zip Code" value="<?php echo $zip_code_data; ?>" >                                            
                                         </div>
                                         
                                         <div class="form-group">
@@ -431,32 +476,60 @@ foreach($details as $detail) {
                                         <div class="form-group">
                                             <label>City</label>
                                             <select name="city" class="form-control">
-                                                <option value="Chandigarh">Chandigarh</option>
-                                                <option value="Delhi">Delhi</option>
+                                                <?php
+                                                $city_arr = $adminObj->getCity();
+                                                foreach($city_arr as $city_temp) {
+                                                    if($city_id == $city_temp['city_id']) {
+                                                        $checked = "selected";
+                                                    } else {
+                                                        $checked = "";
+                                                    }
+                                                ?>
+                                                    <option value="<?php echo $city_temp['city_id'] ?>" <?php echo $checked ?>><?php echo $city_temp['city_name'] ?></option>
+                                                <?php 
+                                                }
+                                                ?>
                                             </select>
-                                        </div>
-                                        
-                                         <div class="form-group">
-                                            <label>Zip Code</label>
-                                            <input class="form-control" name="zip_code" required="required" placeholder="Zip Code">                                            
                                         </div>
                                         
                                         <div class="form-group">
                                             <label>State</label>
                                             <select name="state" class="form-control">
-                                                <option value="Punjab">Punjab</option>
-                                                <option value="Haryana">Haryana</option>
+                                               <?php
+                                                $state_arr = $adminObj->getState();
+                                                foreach($state_arr as $state_temp) {
+                                                    
+                                                    if($state_id == $state_temp['state_id']) {
+                                                        $checked = "selected";
+                                                    } else {
+                                                        $checked = "";
+                                                    }
+                                                ?>
+                                                    <option value="<?php echo $state_temp['state_id'] ?>" <?php echo $checked ?> ><?php echo $state_temp['state_name'] ?></option>
+                                                <?php 
+                                                }
+                                                ?>
                                             </select>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label>Country</label>
                                             <select name="country" class="form-control">
-                                                <option value="India">India</option>
-                                                <option value="New Zealand">New Zealand</option>
+                                                <?php
+                                                $country_arr = $adminObj->getCountry();
+                                                foreach($country_arr as $country_temp) {
+                                                if($country_id == $country_temp['country_id']) {
+                                                        $checked = "selected";
+                                                    } else {
+                                                        $checked = "";
+                                                    }
+                                                ?>
+                                                    <option value="<?php echo $country_temp['country_id'] ?>" <?php echo $checked ?>><?php echo $country_temp['country_name'] ?></option>
+                                                <?php 
+                                                }
+                                                ?>
                                             </select>
                                         </div>
-                                        
                                         <div class="form-group">
                                             <label>Phone</label>
                                             <input name="main" class="form-control" placeholder="Main Number" value="<?php echo $main_phone; ?>"> <br>
@@ -508,6 +581,59 @@ foreach($details as $detail) {
                                         </div>
                                         
                                         <div class="form-group">
+                                            <label>Happy Hours</label>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="happy_hours" id="optionsRadios1" value="yes" <?php echo $hh_yes_checked ?> >Yes
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="happy_hours" id="optionsRadios2" value="no" <?php echo $hh_no_checked ?> >No
+                                                </label>
+                                            </div>
+                                            <div id="hh_time">
+                                                <div class="form-group">
+                                                    <label>Opening Time</label>
+                                                    <input required="required" name="hh_opening_time" class="form-control" id="hh_opening_time" value="<?php echo $hh_opening_time_data ?>">
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>Closing Time</label>
+                                                    <input required="required" name="hh_closing_time" class="form-control" id="hh_closing_time" value="<?php echo $hh_closing_time_data ?>">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Wifi</label>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="wifi" id="optionsRadios1" value="yes" <?php echo $wifi_yes_checked ?>>Yes
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="wifi" id="optionsRadios2" value="no" <?php echo $wifi_no_checked ?>>No
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Air Conditioned</label>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="airconditioned" id="optionsRadios1" value="yes" <?php echo $ac_yes_checked ?>>Yes
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="airconditioned" id="optionsRadios2" value="no"  <?php echo $ac_no_checked ?>>No
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
                                             <label>Delivery</label>
                                             <div class="radio">
                                                 <label>
@@ -523,32 +649,21 @@ foreach($details as $detail) {
                                         
                                         <div class="form-group">
                                             <label>Seating</label>
+                                            <?php 
+                                            $seating_arr_temp = $adminObj->getSeating(); 
+                                            foreach($seating_arr_temp as $seating) {
+                                                if(in_array($seating['seating_id'], $seating_arr)) {
+                                                    $checked = "checked";
+                                                } else {
+                                                    $checked = "";
+                                                }
+                                            ?>
                                             <div class="checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="seating[]" value="Dining" <?php echo $dine_checked ?>>Dining
+                                                    <input type="checkbox" name="seating[]" value="<?php echo $seating['seating_id'] ?>" <?php echo $checked ?>><?php echo $seating['seating_name'] ?>
                                                 </label>
-                                            </div>
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox" name="seating[]" value="Roof" <?php echo $roof_checked ?>>Open/Roof
-                                                </label>
-                                            </div>
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox" name="seating[]" value="Outdoor" <?php echo $outdoor_checked ?>>Outdoor
-                                                </label>
-                                            </div>
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox" name="seating[]" value="Lounge" <?php echo $lounge_checked ?>>Lounge
-                                                </label>
-                                            </div>
-                                             <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox" name="seating[]" value="Bar" <?php echo $bar_checked ?>>Bar
-                                                </label>
-                                            </div>
-                                            
+                                            </div>                                            
+                                            <?php } ?>
                                         </div>
                                         
                                         <div class="form-group">
@@ -631,7 +746,7 @@ foreach($details as $detail) {
                                         
                                         <div class="form-group">
                                             <label>Value for 2</label>
-                                            <input required="required" name="value_for_two" class="form-control" placeholder="Enter Amount" value="<?php echo $value_for_2 ?>">
+                                            <input name="value_for_two" class="form-control" placeholder="Enter Amount" value="<?php echo $value_for_2 ?>">
                                         </div>
                                         
                                         <div class="form-group">
@@ -727,7 +842,7 @@ foreach($details as $detail) {
                                         <input type="hidden" name="hotel_id" value="<?php echo $hotel_id ?>" />
                                         <input type="hidden" name="form_submit" value="1" />                                        
                                         <button type="submit" class="btn btn-default">Submit Button</button>
-                                        <button type="reset" class="btn btn-default">Reset Button</button>
+                                        <button id="cancel" class="btn btn-default">Cancel</button>
                                     </form>
                                 </div>
                         </div>
@@ -800,6 +915,11 @@ foreach($details as $detail) {
             event.preventDefault();
             blueimp.Gallery($('#links a'), $('#blueimp-gallery').data());
         });
+        
+        $('#cancel').on('click', function (event) {
+            event.preventDefault();
+            window.location.href = 'http://www.burpbig.com/admin/pages/edit_restaurant.php';
+        });
     </script>
     <script type="text/javascript">
             $('#opening_time').timepicker({
@@ -814,17 +934,72 @@ foreach($details as $detail) {
                 minuteStep: 5
             });
             
+             $('#hh_opening_time').timepicker({
+                template: false,
+                showInputs: false,
+                minuteStep: 5
+            });
+            
+            $('#hh_closing_time').timepicker({
+                template: false,
+                showInputs: false,
+                minuteStep: 5
+            });
+            
+            $(document).ready(function(){
+                var alc_val = $("input[name=alcohol]:checked").val();
+                if(alc_val === "yes") {
+                    $("input[name=happy_hours]:radio").prop("disabled",false);                    
+                } else {
+                    $("input[name=happy_hours]:radio").prop("disabled",true);
+                    $("#hh_time").hide();
+                }
+                
+                var happy_hr = $("input[name=happy_hours]:checked").val();
+                if(happy_hr === "yes") {
+                    $("input[name=happy_hours]:radio").prop("disabled",false);
+                    $("#hh_time").show();
+                } else {                    
+                    $("#hh_time").hide();
+                }
+            });
+            
+            $("input[name=alcohol]:radio").change(function () {
+                var value = $(this).val();
+                if(value === "yes") {
+                    $("input[name=happy_hours]:radio").prop("disabled",false);
+                    $('input[name=happy_hours]:radio').filter('[value="yes"]').attr('checked', true);
+                    $("#hh_time").show();
+                } else {
+                    $('input[name=happy_hours]:radio').filter('[value="yes"]').attr('checked', false);
+                    $('input[name=happy_hours]:radio').filter('[value="no"]').attr('checked', false);
+                    $("input[name=happy_hours]:radio").prop("disabled",true);                    
+                    $("#hh_time").hide();
+                }
+            });
+            
+            $("input[name=happy_hours]:radio").change(function () {
+                var value = $(this).val();
+                if(value === "no") {
+                    $("#hh_time").hide();
+                } else {
+                    $("#hh_time").show();                    
+                }
+            });
+            
             function deleteImage(image_id,image_type)
             {
-                
+                var bool = confirm('Do you want to delete this image ?');
+                if(bool) {
                 $.ajax({
                     method: "POST",
                     url: "ajax.php",
                     data: { image_id: image_id, image_type: image_type }
                   })
                     .done(function( msg ) {
-                      //alert( "Data Saved: " + msg );
+                      alert( msg );
                     });
+                }
             }
         </script>
     <?php

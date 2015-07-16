@@ -41,6 +41,19 @@ class Admin {
         return $data;
     }
     
+    public function getSeating($active = "1") {
+
+        $query = "SELECT `seating_id`, `seating_name` FROM `bb_seating` WHERE `seating_active` = :active";
+
+        $qh = $this->con->getQueryHandler($query, array("active" => $active));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res;
+        }
+
+        return $data;
+    }
+    
     public function getMenuSelection($type_id, $hotel_id) {
 
         $query = "SELECT `breakfast`, `lunch`, `dinner` FROM `bb_menu_selection` WHERE `type_id` = :type_id AND `hotel_id` = :hotel_id";
@@ -76,9 +89,48 @@ class Admin {
         return $qh->fetch(PDO::FETCH_ASSOC);
     }
     
+    public function getCity($active = "1") {
+
+        $query = "SELECT `city_id`, `city_name` FROM `bb_city` WHERE `active` = :active";
+
+        $qh = $this->con->getQueryHandler($query, array("active" => $active));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res;
+        }
+
+        return $data;
+    }
+    
+    public function getState($active = "1") {
+
+        $query = "SELECT `state_id`, `state_name` FROM `bb_state` WHERE `active` = :active";
+
+        $qh = $this->con->getQueryHandler($query, array("active" => $active));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res;
+        }
+
+        return $data;
+    }
+    
+    public function getCountry($active = "1") {
+
+        $query = "SELECT `country_id`, `country_name` FROM `bb_country` WHERE `active` = :active";
+
+        $qh = $this->con->getQueryHandler($query, array("active" => $active));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res;
+        }
+
+        return $data;
+    }
+    
     public function getHotelsList() {
 
-        $query = "SELECT `hotel_id`, `hotel_name`, `rest_id` FROM `bb_hotel`";
+        $query = "SELECT `hotel_id`, `hotel_name`, `rest_name` FROM `bb_hotel` bh, `bb_rest` br WHERE bh.`rest_id` = br.`rest_id`";
 
         $qh = $this->con->getQueryHandler($query, array());
         while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
@@ -93,6 +145,30 @@ class Admin {
         $query = "SELECT `hotel_id` FROM `bb_hotel` WHERE LOWER(`hotel_name`) = :hotel_name";
 
         $qh = $this->con->getQueryHandler($query, array("hotel_name" => $name));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res;
+        }
+
+        return $data;
+    }
+    
+    public function checkHotelInAd($hotel_id, $type_id) {
+
+        $query = "SELECT COUNT(*) as total FROM `bb_advertisement` WHERE `ad_hotel_id` = :hotel_id AND `ad_type_id` = :type_id";
+
+        $qh = $this->con->getQueryHandler($query, array("hotel_id" => $hotel_id, "type_id"=>$type_id));
+        
+        $res = $qh->fetch(PDO::FETCH_ASSOC);
+            
+        return ($res['total'] == 0)?true:false;
+    }
+    
+    public function getAdvType() {
+
+        $query = "SELECT `ad_type_id`, `ad_type_name` FROM `bb_ad_type`";
+
+        $qh = $this->con->getQueryHandler($query, array());
         $data = array();
         while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
             $data[] = $res;
@@ -151,11 +227,11 @@ class Admin {
         return $id;
     }
     
-    public function updateHotel($name, $hotel_id) {
+    public function updateHotel($name, $hotel_id,$rest_id) {
 
-        $query = "UPDATE `bb_hotel` SET `hotel_name` = :hotel_name, `updated_date`= NOW() WHERE `hotel_id` = :hotel_id";
+        $query = "UPDATE `bb_hotel` SET `hotel_name` = :hotel_name,`rest_id` = :rest_id, `updated_date`= NOW() WHERE `hotel_id` = :hotel_id";
 
-        $bindParams = array("hotel_name" => $name,"hotel_id"=>$hotel_id);
+        $bindParams = array("hotel_name" => $name,"hotel_id"=>$hotel_id,"rest_id"=>$rest_id);
 
         $id = $this->con->insertQuery($query, $bindParams);
 
@@ -237,6 +313,17 @@ class Admin {
         $query = "DELETE FROM `bb_banquet` WHERE `banquet_id` = :banquet_id";
 
         $bindParams = array("banquet_id" => $id);
+
+        $id = $this->con->insertQuery($query, $bindParams);
+
+        return $id;
+    }
+    
+    public function deleteHotel($id) {
+
+        $query = "DELETE FROM `bb_hotel` WHERE `hotel_id` = :hotel_id";
+
+        $bindParams = array("hotel_id" => $id);
 
         $id = $this->con->insertQuery($query, $bindParams);
 
@@ -408,12 +495,12 @@ class Admin {
         return $data;
     }
 
-    public function insertAdvertisement($hotel_id,$cover_pic,$start_date,$end_date) {
+    public function insertAdvertisement($hotel_id,$cover_pic,$type_id,$start_date,$end_date) {
 
-        $query = "INSERT INTO `bb_advertisement`(`ad_hotel_id`, `ad_cover_pic`, `ad_start_date`, `ad_end_date`) "
-                . "VALUES (:hotel_id,:cover_pic,:start_date,:end_date)";
+        $query = "INSERT INTO `bb_advertisement`(`ad_hotel_id`, `ad_cover_pic`, `ad_type_id`, `ad_start_date`, `ad_end_date`) "
+                . "VALUES (:hotel_id,:cover_pic,:type_id,:start_date,:end_date)";
 
-        $bindParams = array("hotel_id" => $hotel_id,"cover_pic"=>$cover_pic,"start_date"=>$start_date,"end_date"=>$end_date);
+        $bindParams = array("hotel_id" => $hotel_id,"cover_pic"=>$cover_pic,"type_id"=>$type_id,"start_date"=>$start_date,"end_date"=>$end_date);
 
         $id = $this->con->insertQuery($query, $bindParams);
 

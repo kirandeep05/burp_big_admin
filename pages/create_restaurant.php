@@ -37,7 +37,16 @@ if(isset($_POST['form_submit'])) {
     $gallery_images = $_FILES['gallery'];
     $cover_pic = $_FILES['cover_pic'];
     $zip_code = isset($_POST['zip_code'])?$_POST['zip_code']:"";  
-    
+    $happy_hours = isset($_POST['happy_hours'])?$_POST['happy_hours']:"";
+    $wifi = isset($_POST['wifi'])?$_POST['wifi']:"";
+    $airconditioned = isset($_POST['airconditioned'])?$_POST['airconditioned']:"";
+    if($happy_hours == "yes") {
+        $hh_opening_time = isset($_POST['hh_opening_time'])?$_POST['hh_opening_time']:"";
+        $hh_closing_time = isset($_POST['hh_closing_time'])?$_POST['hh_closing_time']:"";
+    } else {
+        $hh_opening_time = "";
+        $hh_closing_time = "";
+    }
     
     $field_id[] = "2";
     $field_id[] = "3";
@@ -61,6 +70,11 @@ if(isset($_POST['form_submit'])) {
     $field_id[] = "21";
     $field_id[] = "22";
     $field_id[] = "23";
+    $field_id[] = "24";
+    $field_id[] = "25";
+    $field_id[] = "26";
+    $field_id[] = "27";
+    $field_id[] = "28";
     
     $field_val[] = $rest_desc;
     $field_val[] = $type;
@@ -84,6 +98,11 @@ if(isset($_POST['form_submit'])) {
     $field_val[] = $value_for_2;
     $field_val[] = $cover_pic;
     $field_val[] = $zip_code;
+    $field_val[] = $happy_hours;
+    $field_val[] = $wifi;
+    $field_val[] = $airconditioned;
+    $field_val[] = $hh_opening_time;
+    $field_val[] = $hh_closing_time;
     
     $rest_id = $_POST['hotel_id'];
     $check_hotel = $adminObj->checkHotel($hotel_name);
@@ -265,13 +284,13 @@ if(isset($_POST['form_submit'])) {
                                         
                                         <div class="form-group">
                                             <label>Description</label>
-                                            <input class="form-control" name="rest_desc" required="required" placeholder="Description of Hotel">
+                                            <input class="form-control" name="rest_desc" placeholder="Description of Hotel">
                                             <p class="help-block">Example "Bakery".</p>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label>Visitor Attraction</label>
-                                            <input class="form-control" name="rest_known_for" required="required" placeholder="What is the hotel known for ?">
+                                            <input class="form-control" name="rest_known_for" placeholder="What is the hotel known for ?">
                                             <p class="help-block">Example "The must-go-to place in Chandigarh for THE Butter Chicken experience!".</p>
                                         </div>
                                         
@@ -295,24 +314,42 @@ if(isset($_POST['form_submit'])) {
                                         <div class="form-group">
                                             <label>City</label>
                                             <select name="city" class="form-control">
-                                                <option value="Chandigarh">Chandigarh</option>
-                                                <option value="Delhi">Delhi</option>
+                                                <?php
+                                                $city_arr = $adminObj->getCity();
+                                                foreach($city_arr as $city_temp) {
+                                                ?>
+                                                    <option value="<?php echo $city_temp['city_id'] ?>"><?php echo $city_temp['city_name'] ?></option>
+                                                <?php 
+                                                }
+                                                ?>
                                             </select>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label>State</label>
                                             <select name="state" class="form-control">
-                                                <option value="Punjab">Punjab</option>
-                                                <option value="Haryana">Haryana</option>
+                                               <?php
+                                                $state_arr = $adminObj->getState();
+                                                foreach($state_arr as $state_temp) {
+                                                ?>
+                                                    <option value="<?php echo $state_temp['state_id'] ?>"><?php echo $state_temp['state_name'] ?></option>
+                                                <?php 
+                                                }
+                                                ?>
                                             </select>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label>Country</label>
                                             <select name="country" class="form-control">
-                                                <option value="India">India</option>
-                                                <option value="New Zealand">New Zealand</option>
+                                                <?php
+                                                $country_arr = $adminObj->getCountry();
+                                                foreach($country_arr as $country_temp) {
+                                                ?>
+                                                    <option value="<?php echo $country_temp['country_id'] ?>"><?php echo $country_temp['country_name'] ?></option>
+                                                <?php 
+                                                }
+                                                ?>
                                             </select>
                                         </div>
                                         
@@ -352,12 +389,65 @@ if(isset($_POST['form_submit'])) {
                                             <label>Alcohol</label>
                                             <div class="radio">
                                                 <label>
-                                                    <input type="radio" name="alcohol" id="optionsRadios1" value="yes" checked>Yes
+                                                    <input type="radio" name="alcohol" id="optionsRadios1" value="yes">Yes
                                                 </label>
                                             </div>
                                             <div class="radio">
                                                 <label>
-                                                    <input type="radio" name="alcohol" id="optionsRadios2" value="no">No
+                                                    <input type="radio" name="alcohol" id="optionsRadios2" value="no" checked>No
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Happy Hours</label>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="happy_hours" id="optionsRadios1" value="yes">Yes
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="happy_hours" id="optionsRadios2" value="no">No
+                                                </label>
+                                            </div>
+                                            <div id="hh_time">
+                                                <div class="form-group">
+                                                    <label>Opening Time</label>
+                                                    <input required="required" name="hh_opening_time" class="form-control" id="hh_opening_time">
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>Closing Time</label>
+                                                    <input required="required" name="hh_closing_time" class="form-control" id="hh_closing_time">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Wifi</label>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="wifi" id="optionsRadios1" value="yes">Yes
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="wifi" id="optionsRadios2" value="no" checked>No
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Air Conditioned</label>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="airconditioned" id="optionsRadios1" value="yes">Yes
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="airconditioned" id="optionsRadios2" value="no" checked>No
                                                 </label>
                                             </div>
                                         </div>
@@ -378,32 +468,16 @@ if(isset($_POST['form_submit'])) {
                                         
                                         <div class="form-group">
                                             <label>Seating</label>
+                                            <?php 
+                                            $seating_arr = $adminObj->getSeating(); 
+                                            foreach($seating_arr as $seating) {
+                                            ?>
                                             <div class="checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="seating[]" value="Dining">Dining
+                                                    <input type="checkbox" name="seating[]" value="<?php echo $seating['seating_id'] ?>"><?php echo $seating['seating_name'] ?>
                                                 </label>
-                                            </div>
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox" name="seating[]" value="Roof">Open/Roof
-                                                </label>
-                                            </div>
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox" name="seating[]" value="Outdoor">Outdoor
-                                                </label>
-                                            </div>
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox" name="seating[]" value="Lounge">Lounge
-                                                </label>
-                                            </div>
-                                             <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox" name="seating[]" value="Lounge">Bar
-                                                </label>
-                                            </div>
-                                            
+                                            </div>                                            
+                                            <?php } ?>
                                         </div>
                                         
                                         <div class="form-group">
@@ -473,7 +547,7 @@ if(isset($_POST['form_submit'])) {
                                         
                                         <div class="form-group">
                                             <label>Value for 2</label>
-                                            <input required="required" name="value_for_two" class="form-control" placeholder="Enter Amount">
+                                            <input name="value_for_two" class="form-control" placeholder="Enter Amount">
                                         </div>
                                         
                                         <div class="form-group">
@@ -541,6 +615,59 @@ if(isset($_POST['form_submit'])) {
                 template: false,
                 showInputs: false,
                 minuteStep: 5
+            });
+            
+            $('#hh_opening_time').timepicker({
+                template: false,
+                showInputs: false,
+                minuteStep: 5
+            });
+            
+            $('#hh_closing_time').timepicker({
+                template: false,
+                showInputs: false,
+                minuteStep: 5
+            });
+            
+            $(document).ready(function(){
+                var alc_val = $("input[name=alcohol]:checked").val();
+                if(alc_val === "yes") {
+                    $("input[name=happy_hours]:radio").prop("disabled",false);                    
+                } else {
+                    $("input[name=happy_hours]:radio").prop("disabled",true);
+                    $("#hh_time").hide();
+                }
+                
+                var happy_hr = $("input[name=happy_hours]:checked").val();
+                if(happy_hr === "yes") {
+                    $("input[name=happy_hours]:radio").prop("disabled",false);
+                    $("#hh_time").show();
+                } else {                    
+                    $("#hh_time").hide();
+                }
+            });
+            
+            $("input[name=alcohol]:radio").change(function () {
+                var value = $(this).val();
+                if(value === "yes") {
+                    $("input[name=happy_hours]:radio").prop("disabled",false);
+                    $('input[name=happy_hours]:radio').filter('[value="yes"]').attr('checked', true);
+                    $("#hh_time").show();
+                } else {
+                    $('input[name=happy_hours]:radio').filter('[value="yes"]').attr('checked', false);
+                    $('input[name=happy_hours]:radio').filter('[value="no"]').attr('checked', false);
+                    $("input[name=happy_hours]:radio").prop("disabled",true);                    
+                    $("#hh_time").hide();
+                }
+            });
+            
+            $("input[name=happy_hours]:radio").change(function () {
+                var value = $(this).val();
+                if(value === "no") {
+                    $("#hh_time").hide();
+                } else {
+                    $("#hh_time").show();                    
+                }
             });
         </script>
 </body>

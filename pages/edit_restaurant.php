@@ -15,7 +15,7 @@ $adminObj = new Admin();
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Tables</h1>
+                    <h1 class="page-header">Edit Restaurant</h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -24,7 +24,7 @@ $adminObj = new Admin();
                 <div class="col-lg-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            DataTables Advanced Tables
+                            Edit Restaurant
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
@@ -36,7 +36,7 @@ $adminObj = new Admin();
                                             <th>Hotel Name</th>
                                             <th>Edit</th>
                                             <th>Active</th>
-                                            <!-- <th>Suspend</th> -->
+                                            <th>Delete</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -55,7 +55,7 @@ $adminObj = new Admin();
                                             <td><?php echo $rest_arr['hotel_name'] ?></td>
                                             <td><button onclick="location.href='edit_single_rest.php?hotel_id=<?php echo $rest_arr['hotel_id'] ?>'">Edit</button></td>
                                             <td class="center"><?php echo $rest_arr['active'] ?></td>
-                                           <!-- <td class="center"><button onclick="">Suspend</button></td> -->
+                                            <td class="center"><button onclick="deleteHotel('<?php echo $rest_arr['hotel_id'] ?>','hotel')">Delete</button></td>
                                         </tr>
                                      <?php } ?>
                                     </tbody>
@@ -100,16 +100,20 @@ $adminObj = new Admin();
         });
     });
     
-    function deleteImage(image_id,image_type)
+    function deleteHotel(image_id,image_type)
     {
-        $.ajax({
-            method: "POST",
-            url: "ajax.php",
-            data: { image_id: image_id, image_type: image_type }
-          })
-            .done(function( msg ) {
-              //alert( "Data Saved: " + msg );
-            });
+        var bool = confirm('Do you want to delete this hotel ?');
+        if(bool) {
+            $.ajax({
+                method: "POST",
+                url: "ajax.php",
+                data: { image_id: image_id, image_type: image_type }
+              })
+                .done(function( msg ) {
+                  alert( msg );
+                });
+                location.href = location.href;
+            }
     }
     </script>
 
