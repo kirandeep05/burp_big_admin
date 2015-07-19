@@ -24,4 +24,7 @@ if($image_type == "gallery") {
 } else if($image_type == "hotel") {
     $adminObj->deleteHotel($image_id);
     echo "Hotel deleted";
+}  else if($image_type == "advertisement") {
+    $adminObj->deleteAdvertisement($image_id);
+    echo "Advertisement deleted";
 }

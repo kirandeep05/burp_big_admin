@@ -258,8 +258,17 @@
                             <a href="add_cuisines.php"><i class="fa fa-table fa-fw"></i> Add Cuisines</a>
                         </li>
                         <li>
-                            <a href="add_advertisement.php"><i class="fa fa-table fa-fw"></i> Add Advertisement</a>
-                        </li>
+                            <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i>Advertisement<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="add_advertisement.php"><i class="fa fa-table fa-fw"></i> Add Advertisement</a>
+                                </li>
+                                <li>
+                                    <a href="edit_advertisement.php"><i class="fa fa-table fa-fw"></i> Edit Advertisement</a>
+                                </li>
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>                        
                     </ul>
                 </div>
                 <!-- /.sidebar-collapse -->

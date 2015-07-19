@@ -312,16 +312,17 @@ if(isset($_POST['form_submit'])) {
                                             <label>Area</label>
                                             <input class="form-control" name="area" required="required" placeholder="Enter the Area">
                                             <p class="help-block">Example "Sector-43A".</p>
-                                        </div>
+                                        </div>                                                                                
                                         
                                         <div class="form-group">
-                                            <label>City</label>
-                                            <select name="city" class="form-control">
+                                            <label>Country</label>
+                                            <select name="country" class="form-control">
+                                                <option value="0">Select Country</option>
                                                 <?php
-                                                $city_arr = $adminObj->getCity();
-                                                foreach($city_arr as $city_temp) {
+                                                $country_arr = $adminObj->getCountry();
+                                                foreach($country_arr as $country_temp) {
                                                 ?>
-                                                    <option value="<?php echo $city_temp['city_id'] ?>"><?php echo $city_temp['city_name'] ?></option>
+                                                    <option value="<?php echo $country_temp['Code'] ?>"><?php echo $country_temp['Name'] ?></option>
                                                 <?php 
                                                 }
                                                 ?>
@@ -331,28 +332,14 @@ if(isset($_POST['form_submit'])) {
                                         <div class="form-group">
                                             <label>State</label>
                                             <select name="state" class="form-control">
-                                               <?php
-                                                $state_arr = $adminObj->getState();
-                                                foreach($state_arr as $state_temp) {
-                                                ?>
-                                                    <option value="<?php echo $state_temp['state_id'] ?>"><?php echo $state_temp['state_name'] ?></option>
-                                                <?php 
-                                                }
-                                                ?>
+                                               <option value="0">Select State</option>                                               
                                             </select>
                                         </div>
-                                        
+                                                                                
                                         <div class="form-group">
-                                            <label>Country</label>
-                                            <select name="country" class="form-control">
-                                                <?php
-                                                $country_arr = $adminObj->getCountry();
-                                                foreach($country_arr as $country_temp) {
-                                                ?>
-                                                    <option value="<?php echo $country_temp['country_id'] ?>"><?php echo $country_temp['country_name'] ?></option>
-                                                <?php 
-                                                }
-                                                ?>
+                                            <label>City</label>
+                                            <select name="city" class="form-control">  
+                                                <option value="0">Select City</option> 
                                             </select>
                                         </div>
                                         
@@ -686,6 +673,48 @@ if(isset($_POST['form_submit'])) {
                     $("#hh_time").show();                    
                 }
             });
+            
+            $( "select[name=country]" ).change(function () {            
+              var country_code = $( "select[name=country] option:selected" ).val();
+               $.ajax({
+                    method: "POST",
+                    url: "location.php",
+                    data: { type: "state", country_code: country_code }
+                  })
+                    .done(function( msg ) {
+                      myOptions = $.parseJSON(msg) ;
+                      mySelect = $( "select[name=state]" );
+                      mySelect.html($('<option></option>').val("0").html("Select State"));
+                        $.each(myOptions, function(val,text) {
+                            //console.log(text.District);
+                             mySelect.append(
+                                 $('<option></option>').val(text.District).html(text.District)
+                             );
+                         });
+                    });
+            });
+            
+            $( "select[name=state]" ).change(function () {            
+              var country_code = $( "select[name=country] option:selected" ).val();
+              var state = $( "select[name=state] option:selected" ).val();
+               $.ajax({
+                    method: "POST",
+                    url: "location.php",
+                    data: { type: "city", country_code: country_code, district: state }
+                  })
+                    .done(function( msg ) {
+                      myOptions = $.parseJSON(msg) ;
+                      mySelect = $( "select[name=city]" );
+                      mySelect.html($('<option></option>').val("0").html("Select City"));
+                        $.each(myOptions, function(val,text) {
+                            //console.log(text);
+                             mySelect.append(
+                                 $('<option></option>').val(text.ID).html(text.Name)
+                             );
+                         });
+                    });
+            });
+            
         </script>
 </body>
 
