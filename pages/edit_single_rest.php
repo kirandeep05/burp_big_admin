@@ -493,19 +493,21 @@ foreach($details as $detail) {
                                         </div>
                                         
                                         <div class="form-group">
-                                            <label>City</label>
-                                            <select name="city" class="form-control">
+                                            <label>Country</label>
+                                            <select name="country" class="form-control">
+                                                <option value="0">Select Country</option>
                                                 <?php
-                                                $city_arr = $adminObj->getCity();
-                                                foreach($city_arr as $city_temp) {
-                                                    if($city_id == $city_temp['city_id']) {
-                                                        $checked = "selected";
+                                                $country_arr = $adminObj->getCountry();
+                                                foreach($country_arr as $country_temp) {
+                                                    if($country_id == $country_temp['Code']) {
+                                                ?>   
+                                                <option value="<?php echo $country_temp['Code'] ?>" selected="selected"><?php echo $country_temp['Name'] ?></option>
+                                                <?php
                                                     } else {
-                                                        $checked = "";
-                                                    }
                                                 ?>
-                                                    <option value="<?php echo $city_temp['city_id'] ?>" <?php echo $checked ?>><?php echo $city_temp['city_name'] ?></option>
+                                                    <option value="<?php echo $country_temp['Code'] ?>"><?php echo $country_temp['Name'] ?></option>
                                                 <?php 
+                                                    }
                                                 }
                                                 ?>
                                             </select>
@@ -514,41 +516,45 @@ foreach($details as $detail) {
                                         <div class="form-group">
                                             <label>State</label>
                                             <select name="state" class="form-control">
-                                               <?php
-                                                $state_arr = $adminObj->getState();
+                                               <option value="0">Select State</option> 
+                                               <?php 
+                                               $state_arr = $adminObj->getState($country_id);
                                                 foreach($state_arr as $state_temp) {
-                                                    
-                                                    if($state_id == $state_temp['state_id']) {
-                                                        $checked = "selected";
-                                                    } else {
-                                                        $checked = "";
-                                                    }
+                                                    if($state_id == $state_temp['District']) {
                                                 ?>
-                                                    <option value="<?php echo $state_temp['state_id'] ?>" <?php echo $checked ?> ><?php echo $state_temp['state_name'] ?></option>
+                                               <option value="<?php echo $state_temp['District'] ?>" selected="selected"><?php echo $state_temp['District'] ?></option>
+                                                <?php
+                                                    } else {
+                                                ?>
+                                                    <option value="<?php echo $state_temp['District'] ?>"><?php echo $state_temp['District'] ?></option>
                                                 <?php 
+                                                    }
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                                                                
+                                        <div class="form-group">
+                                            <label>City</label>
+                                            <select name="city" class="form-control">  
+                                                <option value="0">Select City</option>
+                                                <?php 
+                                               $city_arr = $adminObj->getCity($state_id, $country_id);
+                                                foreach($city_arr as $city_temp) {
+                                                    if($city_id == $city_temp['ID']) {
+                                                ?>
+                                               <option value="<?php echo $city_temp['ID'] ?>" selected="selected"><?php echo $city_temp['Name'] ?></option>
+                                                <?php
+                                                    } else {
+                                                ?>
+                                                    <option value="<?php echo $city_temp['ID'] ?>"><?php echo $city_temp['Name'] ?></option>
+                                                <?php 
+                                                    }
                                                 }
                                                 ?>
                                             </select>
                                         </div>
                                         
-                                        <div class="form-group">
-                                            <label>Country</label>
-                                            <select name="country" class="form-control">
-                                                <?php
-                                                $country_arr = $adminObj->getCountry();
-                                                foreach($country_arr as $country_temp) {
-                                                if($country_id == $country_temp['country_id']) {
-                                                        $checked = "selected";
-                                                    } else {
-                                                        $checked = "";
-                                                    }
-                                                ?>
-                                                    <option value="<?php echo $country_temp['country_id'] ?>" <?php echo $checked ?>><?php echo $country_temp['country_name'] ?></option>
-                                                <?php 
-                                                }
-                                                ?>
-                                            </select>
-                                        </div>
                                         <div class="form-group">
                                             <label>Phone</label>
                                             <input name="main" class="form-control" placeholder="Main Number" value="<?php echo $main_phone; ?>"> <br>
@@ -1018,6 +1024,47 @@ foreach($details as $detail) {
                 } else {
                     $("#hh_time").show();                    
                 }
+            });
+            
+            $( "select[name=country]" ).change(function () {            
+              var country_code = $( "select[name=country] option:selected" ).val();
+               $.ajax({
+                    method: "POST",
+                    url: "location.php",
+                    data: { type: "state", country_code: country_code }
+                  })
+                    .done(function( msg ) {
+                      myOptions = $.parseJSON(msg) ;
+                      mySelect = $( "select[name=state]" );
+                      mySelect.html($('<option></option>').val("0").html("Select State"));
+                        $.each(myOptions, function(val,text) {
+                            //console.log(text.District);
+                             mySelect.append(
+                                 $('<option></option>').val(text.District).html(text.District)
+                             );
+                         });
+                    });
+            });
+            
+            $( "select[name=state]" ).change(function () {            
+              var country_code = $( "select[name=country] option:selected" ).val();
+              var state = $( "select[name=state] option:selected" ).val();
+               $.ajax({
+                    method: "POST",
+                    url: "location.php",
+                    data: { type: "city", country_code: country_code, district: state }
+                  })
+                    .done(function( msg ) {
+                      myOptions = $.parseJSON(msg) ;
+                      mySelect = $( "select[name=city]" );
+                      mySelect.html($('<option></option>').val("0").html("Select City"));
+                        $.each(myOptions, function(val,text) {
+                            //console.log(text);
+                             mySelect.append(
+                                 $('<option></option>').val(text.ID).html(text.Name)
+                             );
+                         });
+                    });
             });
             
             function deleteImage(image_id,image_type)

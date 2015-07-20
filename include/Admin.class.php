@@ -89,11 +89,11 @@ class Admin {
         return $qh->fetch(PDO::FETCH_ASSOC);
     }
     
-    public function getCity($active = "1") {
+    public function getCity($district,$country_code,$active = "1") {
 
-        $query = "SELECT `city_id`, `city_name` FROM `bb_city` WHERE `active` = :active";
+        $query = "SELECT `ID`, `Name` FROM `city` WHERE `District` = :district AND `CountryCode` = :country_code AND `active` = :active";
 
-        $qh = $this->con->getQueryHandler($query, array("active" => $active));
+        $qh = $this->con->getQueryHandler($query, array("district"=>$district,"country_code"=>$country_code,"active" => $active));
         $data = array();
         while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
             $data[] = $res;
@@ -102,11 +102,11 @@ class Admin {
         return $data;
     }
     
-    public function getState($active = "1") {
+    public function getState($country_code,$active = "1") {
 
-        $query = "SELECT `state_id`, `state_name` FROM `bb_state` WHERE `active` = :active";
+        $query = "SELECT DISTINCT `District` FROM `city` WHERE `CountryCode` = :country_code AND `active` = :active";
 
-        $qh = $this->con->getQueryHandler($query, array("active" => $active));
+        $qh = $this->con->getQueryHandler($query, array("country_code"=>$country_code,"active" => $active));
         $data = array();
         while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
             $data[] = $res;
@@ -117,7 +117,7 @@ class Admin {
     
     public function getCountry($active = "1") {
 
-        $query = "SELECT `country_id`, `country_name` FROM `bb_country` WHERE `active` = :active";
+        $query = "SELECT `Code`, `Name` FROM `country` WHERE `active` = :active";
 
         $qh = $this->con->getQueryHandler($query, array("active" => $active));
         $data = array();

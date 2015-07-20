@@ -92,16 +92,18 @@ class Restaurant {
     
     public function getSingleRestDetail($hotel_id) {
 
-        $query = "SELECT `field_name`, `hotel_field_val`,`hotel_name` FROM `bb_hotel_details` hd,`bb_hotel_fields` hf,`bb_hotel` hh "
+        $query = "SELECT hd.`hotel_id`,`field_name`, `hotel_field_val`,`hotel_name` FROM `bb_hotel_details` hd,`bb_hotel_fields` hf,`bb_hotel` hh "
                 . "WHERE `hotel_field_id` = `field_id` "
-                . "AND hh.`hotel_id` = 8 AND "
+                . "AND hh.`hotel_id` IN (".  implode(",", $hotel_id).")  AND "
                 . "hh.`hotel_id` = hd.`hotel_id`";
 
-        $qh = $this->con->getQueryHandler($query, array("hotel_id" => $hotel_id));
+        $qh = $this->con->getQueryHandler($query, array());
         $data = array();
+        $i=0;
         while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
-            $data[$res['field_name']] = $res['hotel_field_val'];
-            $data['hotel_name'] = $res['hotel_name'];
+            $data[$res['hotel_id']][$res['field_name']] = $res['hotel_field_val'];
+            $data[$res['hotel_id']]['hotel_name'] = $res['hotel_name'];
+            $data[$res['hotel_id']]['hotel_id'] = $res['hotel_id'];
         }
 
         return $data;
@@ -157,6 +159,32 @@ class Restaurant {
         $data = array();
         while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
             $data[] = $res;
+        }
+
+        return $data;
+    }
+    
+    public function getHotelIDFromHotelDetails($field_id,$field_val) {
+                
+        $query = "SELECT `hotel_id` FROM `bb_hotel_details` WHERE `hotel_field_id` = :field_id AND `hotel_field_val` LIKE :field_val";
+
+        $qh = $this->con->getQueryHandler($query, array("field_id"=>$field_id,"field_val"=>$field_val));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res['hotel_id'];
+        }
+
+        return $data;
+    }
+    
+    public function getHotelIDFromMenuSel($field_id,$field_val) {
+                
+        $query = "SELECT `hotel_id` FROM `bb_menu_selection` WHERE `$field_id` = '$field_val'";
+
+        $qh = $this->con->getQueryHandler($query, array("field_id"=>$field_id,"field_val"=>$field_val));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res['hotel_id'];
         }
 
         return $data;
