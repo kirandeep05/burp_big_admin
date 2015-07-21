@@ -446,7 +446,7 @@ foreach($details as $detail) {
                                             <?php 
                                                 $typelist = $adminObj->getEstablishmentType();
                                                 foreach($typelist as $type_temp) {
-                                                    if($type == $type_temp['est_id']) {
+                                                    if($type == $type_temp['est_name']) {
                                                         $checked_temp = "checked";
                                                     } else {
                                                         $checked_temp = "";
@@ -454,7 +454,7 @@ foreach($details as $detail) {
                                             ?>
                                             <div class="radio">
                                                 <label>
-                                                    <input type="radio" name="type" id="optionsRadios1" <?php echo $checked_temp; ?> value="<?php echo $type_temp['est_id'] ?>" ><?php echo $type_temp['est_name'] ?>
+                                                    <input type="radio" name="type" id="optionsRadios1" <?php echo $checked_temp; ?> value="<?php echo $type_temp['est_name'] ?>" ><?php echo $type_temp['est_name'] ?>
                                                 </label>
                                             </div>
                                             
@@ -464,8 +464,8 @@ foreach($details as $detail) {
                                         </div>
                                         
                                         <div class="form-group">
-                                            <label>Description</label>
-                                            <input class="form-control" name="rest_desc" value="<?php echo $rest_desc ?>" placeholder="Description of Hotel">
+                                            <label>Tags</label>
+                                            <input class="form-control" name="rest_desc" data-role="tagsinput" value="<?php echo $rest_desc ?>" placeholder="Tags for Hotel">
                                             <p class="help-block">Example "Bakery".</p>
                                         </div>
                                         
@@ -499,13 +499,13 @@ foreach($details as $detail) {
                                                 <?php
                                                 $country_arr = $adminObj->getCountry();
                                                 foreach($country_arr as $country_temp) {
-                                                    if($country_id == $country_temp['Code']) {
+                                                    if($country_id == $country_temp['Name']) {
                                                 ?>   
-                                                <option value="<?php echo $country_temp['Code'] ?>" selected="selected"><?php echo $country_temp['Name'] ?></option>
+                                                <option value="<?php echo $country_temp['Name'] ?>" selected="selected"><?php echo $country_temp['Name'] ?></option>
                                                 <?php
                                                     } else {
                                                 ?>
-                                                    <option value="<?php echo $country_temp['Code'] ?>"><?php echo $country_temp['Name'] ?></option>
+                                                    <option value="<?php echo $country_temp['Name'] ?>"><?php echo $country_temp['Name'] ?></option>
                                                 <?php 
                                                     }
                                                 }
@@ -541,13 +541,13 @@ foreach($details as $detail) {
                                                 <?php 
                                                $city_arr = $adminObj->getCity($state_id, $country_id);
                                                 foreach($city_arr as $city_temp) {
-                                                    if($city_id == $city_temp['ID']) {
+                                                    if($city_id == $city_temp['Name']) {
                                                 ?>
-                                               <option value="<?php echo $city_temp['ID'] ?>" selected="selected"><?php echo $city_temp['Name'] ?></option>
+                                               <option value="<?php echo $city_temp['Name'] ?>" selected="selected"><?php echo $city_temp['Name'] ?></option>
                                                 <?php
                                                     } else {
                                                 ?>
-                                                    <option value="<?php echo $city_temp['ID'] ?>"><?php echo $city_temp['Name'] ?></option>
+                                                    <option value="<?php echo $city_temp['Name'] ?>"><?php echo $city_temp['Name'] ?></option>
                                                 <?php 
                                                     }
                                                 }
@@ -567,11 +567,11 @@ foreach($details as $detail) {
                                                 <?php 
                                                 $cuisinelist = $adminObj->getCuisines(); 
                                                 foreach($cuisinelist as $cuisine) {
-                                                    if(in_array($cuisine['id'], $cuisines_arr)) {                                                       
+                                                    if(in_array($cuisine['name'], $cuisines_arr)) {                                                       
                                                 ?>
-                                                    <option value="<?php echo $cuisine['id']; ?>" selected><?php echo $cuisine['name']; ?></option>
+                                                    <option value="<?php echo $cuisine['name']; ?>" selected><?php echo $cuisine['name']; ?></option>
                                                 <?php } else { ?>
-                                                    <option value="<?php echo $cuisine['id']; ?>"><?php echo $cuisine['name']; ?></option>
+                                                    <option value="<?php echo $cuisine['name']; ?>"><?php echo $cuisine['name']; ?></option>
                                                 <?php        } 
                                                 }?>
                                             </select>
@@ -691,7 +691,7 @@ foreach($details as $detail) {
                                             <?php 
                                             $seating_arr_temp = $adminObj->getSeating(); 
                                             foreach($seating_arr_temp as $seating) {
-                                                if(in_array($seating['seating_id'], $seating_arr)) {
+                                                if(in_array($seating['seating_name'], $seating_arr)) {
                                                     $checked = "checked";
                                                 } else {
                                                     $checked = "";
@@ -699,7 +699,7 @@ foreach($details as $detail) {
                                             ?>
                                             <div class="checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="seating[]" value="<?php echo $seating['seating_id'] ?>" <?php echo $checked ?>><?php echo $seating['seating_name'] ?>
+                                                    <input type="checkbox" name="seating[]" value="<?php echo $seating['seating_name'] ?>" <?php echo $checked ?>><?php echo $seating['seating_name'] ?>
                                                 </label>
                                             </div>                                            
                                             <?php } ?>
@@ -879,7 +879,10 @@ foreach($details as $detail) {
                                             <div style="clear: both">
                                         </div>
                                         <input type="hidden" name="hotel_id" value="<?php echo $hotel_id ?>" />
-                                        <input type="hidden" name="form_submit" value="1" />                                        
+                                        <input type="hidden" name="form_submit" value="1" />
+                                        <input type="hidden" name="city_hide" />   
+                                        <input type="hidden" name="state_hide" />   
+                                        <input type="hidden" name="country_hide" />   
                                         <button type="submit" class="btn btn-default">Submit Button</button>
                                         <button id="cancel" class="btn btn-default">Cancel</button>
                                     </form>
@@ -944,6 +947,8 @@ foreach($details as $detail) {
     <script type="text/javascript" src="../js/bootstrap-timepicker.js"></script>
     <script src="//blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js"></script>
     <script src="../js/bootstrap-image-gallery.min.js"></script>
+    <script src="../dist/js/bootstrap-tagsinput.js"></script>
+    <script src="../dist/js/typeahead.bundle.js"></script>
     <script>
         function displayMenuSel(id)
         {
@@ -986,86 +991,120 @@ foreach($details as $detail) {
             });
             
             $(document).ready(function(){
-                var alc_val = $("input[name=alcohol]:checked").val();
-                if(alc_val === "yes") {
-                    $("input[name=happy_hours]:radio").prop("disabled",false);                    
-                } else {
-                    $("input[name=happy_hours]:radio").prop("disabled",true);
-                    $("#hh_time").hide();
-                }
-                
-                var happy_hr = $("input[name=happy_hours]:checked").val();
-                if(happy_hr === "yes") {
-                    $("input[name=happy_hours]:radio").prop("disabled",false);
-                    $("#hh_time").show();
-                } else {                    
-                    $("#hh_time").hide();
-                }
-            });
-            
-            $("input[name=alcohol]:radio").change(function () {
-                var value = $(this).val();
-                if(value === "yes") {
-                    $("input[name=happy_hours]:radio").prop("disabled",false);
-                    $('input[name=happy_hours]:radio').filter('[value="yes"]').attr('checked', true);
-                    $("#hh_time").show();
-                } else {
-                    $('input[name=happy_hours]:radio').filter('[value="yes"]').attr('checked', false);
-                    $('input[name=happy_hours]:radio').filter('[value="no"]').attr('checked', false);
-                    $("input[name=happy_hours]:radio").prop("disabled",true);                    
-                    $("#hh_time").hide();
-                }
-            });
-            
-            $("input[name=happy_hours]:radio").change(function () {
-                var value = $(this).val();
-                if(value === "no") {
-                    $("#hh_time").hide();
-                } else {
-                    $("#hh_time").show();                    
-                }
-            });
-            
-            $( "select[name=country]" ).change(function () {            
-              var country_code = $( "select[name=country] option:selected" ).val();
-               $.ajax({
-                    method: "POST",
-                    url: "location.php",
-                    data: { type: "state", country_code: country_code }
-                  })
-                    .done(function( msg ) {
-                      myOptions = $.parseJSON(msg) ;
-                      mySelect = $( "select[name=state]" );
-                      mySelect.html($('<option></option>').val("0").html("Select State"));
-                        $.each(myOptions, function(val,text) {
-                            //console.log(text.District);
-                             mySelect.append(
-                                 $('<option></option>').val(text.District).html(text.District)
-                             );
-                         });
+                    var alc_val = $("input[name=alcohol]:checked").val();
+                    if(alc_val === "yes") {
+                        $("input[name=happy_hours]:radio").prop("disabled",false);                    
+                    } else {
+                        $("input[name=happy_hours]:radio").prop("disabled",true);
+                        $("#hh_time").hide();
+                    }
+
+                    var happy_hr = $("input[name=happy_hours]:checked").val();
+                    if(happy_hr === "yes") {
+                        $("input[name=happy_hours]:radio").prop("disabled",false);
+                        $("#hh_time").show();
+                    } else {                    
+                        $("#hh_time").hide();
+                    }
+
+
+                    $("input[name=alcohol]:radio").change(function () {
+                    var value = $(this).val();
+                    if(value === "yes") {
+                        $("input[name=happy_hours]:radio").prop("disabled",false);
+                        $('input[name=happy_hours]:radio').filter('[value="yes"]').attr('checked', true);
+                        $("#hh_time").show();
+                    } else {
+                        $('input[name=happy_hours]:radio').filter('[value="yes"]').attr('checked', false);
+                        $('input[name=happy_hours]:radio').filter('[value="no"]').attr('checked', false);
+                        $("input[name=happy_hours]:radio").prop("disabled",true);                    
+                        $("#hh_time").hide();
+                    }
                     });
-            });
-            
-            $( "select[name=state]" ).change(function () {            
-              var country_code = $( "select[name=country] option:selected" ).val();
-              var state = $( "select[name=state] option:selected" ).val();
-               $.ajax({
-                    method: "POST",
-                    url: "location.php",
-                    data: { type: "city", country_code: country_code, district: state }
-                  })
-                    .done(function( msg ) {
-                      myOptions = $.parseJSON(msg) ;
-                      mySelect = $( "select[name=city]" );
-                      mySelect.html($('<option></option>').val("0").html("Select City"));
-                        $.each(myOptions, function(val,text) {
-                            //console.log(text);
-                             mySelect.append(
-                                 $('<option></option>').val(text.ID).html(text.Name)
-                             );
-                         });
+
+                    $("input[name=happy_hours]:radio").change(function () {
+                    var value = $(this).val();
+                    if(value === "no") {
+                        $("#hh_time").hide();
+                    } else {
+                        $("#hh_time").show();                    
+                    }
                     });
-            });
+
+                    $( "select[name=country]" ).change(function () {            
+                    var country_code = $( "select[name=country] option:selected" ).val();
+                    $.ajax({
+                        method: "POST",
+                        url: "location.php",
+                        data: { type: "state", country_code: country_code }
+                      })
+                        .done(function( msg ) {
+                          myOptions = $.parseJSON(msg) ;
+                          mySelect = $( "select[name=state]" );
+                          mySelect.html($('<option></option>').val("0").html("Select State"));
+                            $.each(myOptions, function(val,text) {
+                                //console.log(text.District);
+                                 mySelect.append(
+                                     $('<option></option>').val(text.District).html(text.District)
+                                 );
+                             });
+                        });
+                    });
+
+                    $( "select[name=state]" ).change(function () {            
+                    var country_code = $( "select[name=country] option:selected" ).val();
+                    var state = $( "select[name=state] option:selected" ).val();
+                    $.ajax({
+                        method: "POST",
+                        url: "location.php",
+                        data: { type: "city", country_code: country_code, district: state }
+                      })
+                        .done(function( msg ) {
+                          myOptions = $.parseJSON(msg) ;
+                          mySelect = $( "select[name=city]" );
+                          mySelect.html($('<option></option>').val("0").html("Select City"));
+                            $.each(myOptions, function(val,text) {
+                                //console.log(text);
+                                 mySelect.append(
+                                     $('<option></option>').val(text.Name).html(text.Name)
+                                 );
+                             });
+                        });
+                    });
+
+//                    $('#create_form').on('submit', function(e){
+//                        //e.preventDefault();
+//                        var country = $( "select[name=country] option:selected" ).html();
+//                        var state = $( "select[name=state] option:selected" ).html();
+//                        var city = $( "select[name=city] option:selected" ).html();
+//                        console.log(country+"--"+state+"--"+city);
+//                        $("input[name=country_hide]").val(country);
+//                        $("input[name=state_hide]").val(state);
+//                        $("input[name=city_hide]").val(city);
+//                    });
+//                    
+                    var citynames = new Bloodhound({
+                      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+                      queryTokenizer: Bloodhound.tokenizers.whitespace,
+                      prefetch: {
+                        url: 'tagnames.json',
+                        filter: function(list) {
+                          return $.map(list, function(cityname) {
+                            return { name: cityname }; });
+                        }
+                      }
+                    });
+                    citynames.initialize();
+
+//                    $('.bootstrap-tagsinput input:nth(0)').tagsinput({
+//                      typeaheadjs: {
+//                        name: 'citynames',
+//                        displayKey: 'name',
+//                        valueKey: 'name',
+//                        source: citynames.ttAdapter()
+//                      }
+//                    });                                
+             });     
             
             function deleteImage(image_id,image_type)
             {

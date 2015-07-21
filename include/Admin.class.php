@@ -89,11 +89,11 @@ class Admin {
         return $qh->fetch(PDO::FETCH_ASSOC);
     }
     
-    public function getCity($district,$country_code,$active = "1") {
+    public function getCity($district,$country_name,$active = "1") {
 
-        $query = "SELECT `ID`, `Name` FROM `city` WHERE `District` = :district AND `CountryCode` = :country_code AND `active` = :active";
+        $query = "SELECT `ID`, `Name` FROM `city` WHERE `District` = :district AND `CountryCode` = (SELECT `Code` FROM `country` WHERE `Name` = :country_name) AND `active` = :active";
 
-        $qh = $this->con->getQueryHandler($query, array("district"=>$district,"country_code"=>$country_code,"active" => $active));
+        $qh = $this->con->getQueryHandler($query, array("district"=>$district,"country_name"=>$country_name,"active" => $active));
         $data = array();
         while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
             $data[] = $res;
@@ -102,11 +102,11 @@ class Admin {
         return $data;
     }
     
-    public function getState($country_code,$active = "1") {
+    public function getState($country_name,$active = "1") {
 
-        $query = "SELECT DISTINCT `District` FROM `city` WHERE `CountryCode` = :country_code AND `active` = :active";
+        $query = "SELECT DISTINCT `District` FROM `city` WHERE `CountryCode` = (SELECT `Code` FROM `country` WHERE `Name` = :country_name) AND `active` = :active";
 
-        $qh = $this->con->getQueryHandler($query, array("country_code"=>$country_code,"active" => $active));
+        $qh = $this->con->getQueryHandler($query, array("country_name"=>$country_name,"active" => $active));
         $data = array();
         while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
             $data[] = $res;
@@ -126,6 +126,41 @@ class Admin {
         }
 
         return $data;
+    }
+    
+    public function checkTagName($name) {
+
+        $query = "SELECT `tag_id` FROM `bb_tags` WHERE LOWER(`tag_name`) = LOWER(:tag_name)";
+
+        $qh = $this->con->getQueryHandler($query, array("tag_name" => $name));
+        $data = 0;
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data = $res['tag_id'];
+        }
+
+        return $data;
+    }
+    
+    public function insertTagName($name) {
+
+        $query = "INSERT INTO `bb_tags`(`tag_name`) VALUES (:tag_name)";
+
+        $bindParams = array("tag_name" => $name);
+
+        $id = $this->con->insertQuery($query, $bindParams);
+
+        return $id;
+    }
+    
+    public function insertTagHotelXref($tag_id,$hotel_id) {
+
+        $query = "INSERT INTO `bb_tag_hotel_xref`(`tag_id`, `hotel_id`) VALUES (:tag_id,:hotel_id)";
+
+        $bindParams = array("tag_id" => $tag_id, "hotel_id" => $hotel_id);
+
+        $id = $this->con->insertQuery($query, $bindParams);
+
+        return $id;
     }
     
     public function getHotelsList() {

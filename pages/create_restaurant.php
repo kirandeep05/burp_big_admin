@@ -112,6 +112,18 @@ if(isset($_POST['form_submit'])) {
     if(empty($check_hotel)) {
          $hotel_id = $adminObj->insertHotel($hotel_name, $rest_id);
          for($i=0;$i<count($field_id);$i++) {
+             if($field_id[$i] == "2") {
+                $tag_arr = explode(",",$field_val[$i]);
+                foreach($tag_arr as $tag_name) {
+                    $tag_id = $adminObj->checkTagName($tag_name);
+                    if($tag_id == 0) {
+                        $tag_id = $adminObj->insertTagName($tag_name);
+                    }
+                    $adminObj->insertTagHotelXref($tag_id, $hotel_id);
+                }
+                
+             }
+             
              if($field_id[$i] == "22") {
                 $ac_image_path = $adminObj->uploadFile($field_val[$i], "cover_pic");
                 $adminObj->insertHotelDetails($hotel_id, $field_id[$i], $ac_image_path);
@@ -255,7 +267,7 @@ if(isset($_POST['form_submit'])) {
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-lg-6">
-                                    <form role="form" action="create_restaurant.php" method="post" enctype="multipart/form-data">
+                                    <form role="form" action="create_restaurant.php" method="post" id="create_form" enctype="multipart/form-data">
                                         <div class="form-group">
                                             <label>Name of the Hotel</label>
                                             <select  name="hotel_id" class="form-control">
@@ -276,7 +288,7 @@ if(isset($_POST['form_submit'])) {
                                             ?>
                                             <div class="radio">
                                                 <label>
-                                                    <input type="radio" name="type" id="optionsRadios1" value="<?php echo $type_temp['est_id'] ?>" ><?php echo $type_temp['est_name'] ?>
+                                                    <input type="radio" name="type" id="optionsRadios1" value="<?php echo $type_temp['est_name'] ?>" ><?php echo $type_temp['est_name'] ?>
                                                 </label>
                                             </div>
                                             
@@ -286,8 +298,8 @@ if(isset($_POST['form_submit'])) {
                                         </div>
                                         
                                         <div class="form-group">
-                                            <label>Description</label>
-                                            <input class="form-control" name="rest_desc" placeholder="Description of Hotel">
+                                            <label>Tags</label><br/>
+                                            <input class="form-control" data-role="tagsinput" name="rest_desc" placeholder="Tags for Hotel">
                                             <p class="help-block">Example "Bakery".</p>
                                         </div>
                                         
@@ -322,7 +334,7 @@ if(isset($_POST['form_submit'])) {
                                                 $country_arr = $adminObj->getCountry();
                                                 foreach($country_arr as $country_temp) {
                                                 ?>
-                                                    <option value="<?php echo $country_temp['Code'] ?>"><?php echo $country_temp['Name'] ?></option>
+                                                    <option value="<?php echo $country_temp['Name'] ?>"><?php echo $country_temp['Name'] ?></option>
                                                 <?php 
                                                 }
                                                 ?>
@@ -356,7 +368,7 @@ if(isset($_POST['form_submit'])) {
                                                 $cuisinelist = $adminObj->getCuisines(); 
                                                 foreach($cuisinelist as $cuisine) {
                                                 ?>
-                                                <option value="<?php echo $cuisine['id']; ?>"><?php echo $cuisine['name']; ?></option>
+                                                <option value="<?php echo $cuisine['name']; ?>"><?php echo $cuisine['name']; ?></option>
                                                 <?php } ?>
                                             </select>
                                         </div>
@@ -478,7 +490,7 @@ if(isset($_POST['form_submit'])) {
                                             ?>
                                             <div class="checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="seating[]" value="<?php echo $seating['seating_id'] ?>"><?php echo $seating['seating_name'] ?>
+                                                    <input type="checkbox" name="seating[]" value="<?php echo $seating['seating_name'] ?>"><?php echo $seating['seating_name'] ?>
                                                 </label>
                                             </div>                                            
                                             <?php } ?>
@@ -570,7 +582,10 @@ if(isset($_POST['form_submit'])) {
                                             <label>Gallery</label>
                                             <input type="file" name="gallery[]" multiple="multiple">                                            
                                         </div>
-                                        <input type="hidden" name="form_submit" value="1" />                                        
+                                        <input type="hidden" name="form_submit" value="1" />   
+                                        <input type="hidden" name="city_hide" />   
+                                        <input type="hidden" name="state_hide" />   
+                                        <input type="hidden" name="country_hide" />   
                                         <button type="submit" class="btn btn-default">Submit Button</button>
                                         <button type="reset" class="btn btn-default">Reset Button</button>
                                     </form>
@@ -600,6 +615,8 @@ if(isset($_POST['form_submit'])) {
 
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>  
+    <script src="../dist/js/bootstrap-tagsinput.js"></script>
+    <script src="../dist/js/typeahead.bundle.js"></script>
     <script type="text/javascript" src="../js/bootstrap-timepicker.js"></script>
     <script>
         function displayMenuSel(id)
@@ -641,7 +658,7 @@ if(isset($_POST['form_submit'])) {
                     $("input[name=happy_hours]:radio").prop("disabled",true);
                     $("#hh_time").hide();
                 }
-                
+
                 var happy_hr = $("input[name=happy_hours]:checked").val();
                 if(happy_hr === "yes") {
                     $("input[name=happy_hours]:radio").prop("disabled",false);
@@ -649,9 +666,9 @@ if(isset($_POST['form_submit'])) {
                 } else {                    
                     $("#hh_time").hide();
                 }
-            });
-            
-            $("input[name=alcohol]:radio").change(function () {
+
+
+                $("input[name=alcohol]:radio").change(function () {
                 var value = $(this).val();
                 if(value === "yes") {
                     $("input[name=happy_hours]:radio").prop("disabled",false);
@@ -663,20 +680,20 @@ if(isset($_POST['form_submit'])) {
                     $("input[name=happy_hours]:radio").prop("disabled",true);                    
                     $("#hh_time").hide();
                 }
-            });
-            
-            $("input[name=happy_hours]:radio").change(function () {
+                });
+
+                $("input[name=happy_hours]:radio").change(function () {
                 var value = $(this).val();
                 if(value === "no") {
                     $("#hh_time").hide();
                 } else {
                     $("#hh_time").show();                    
                 }
-            });
-            
-            $( "select[name=country]" ).change(function () {            
-              var country_code = $( "select[name=country] option:selected" ).val();
-               $.ajax({
+                });
+
+                $( "select[name=country]" ).change(function () {            
+                var country_code = $( "select[name=country] option:selected" ).val();
+                $.ajax({
                     method: "POST",
                     url: "location.php",
                     data: { type: "state", country_code: country_code }
@@ -692,12 +709,12 @@ if(isset($_POST['form_submit'])) {
                              );
                          });
                     });
-            });
-            
-            $( "select[name=state]" ).change(function () {            
-              var country_code = $( "select[name=country] option:selected" ).val();
-              var state = $( "select[name=state] option:selected" ).val();
-               $.ajax({
+                });
+
+                $( "select[name=state]" ).change(function () {            
+                var country_code = $( "select[name=country] option:selected" ).val();
+                var state = $( "select[name=state] option:selected" ).val();
+                $.ajax({
                     method: "POST",
                     url: "location.php",
                     data: { type: "city", country_code: country_code, district: state }
@@ -709,12 +726,45 @@ if(isset($_POST['form_submit'])) {
                         $.each(myOptions, function(val,text) {
                             //console.log(text);
                              mySelect.append(
-                                 $('<option></option>').val(text.ID).html(text.Name)
+                                 $('<option></option>').val(text.Name).html(text.Name)
                              );
                          });
                     });
-            });
-            
+                });
+
+//                $('#create_form').on('submit', function(e){
+//                    //e.preventDefault();
+//                    var country = $( "select[name=country] option:selected" ).html();
+//                    var state = $( "select[name=state] option:selected" ).html();
+//                    var city = $( "select[name=city] option:selected" ).html();
+//                    console.log(country+"--"+state+"--"+city);
+//                    $("input[name=country_hide]").val(country);
+//                    $("input[name=state_hide]").val(state);
+//                    $("input[name=city_hide]").val(city);
+//                });
+
+                    var citynames = new Bloodhound({
+                      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+                      queryTokenizer: Bloodhound.tokenizers.whitespace,
+                      prefetch: {
+                        url: 'tagnames.json',
+                        filter: function(list) {
+                          return $.map(list, function(cityname) {
+                            return { name: cityname }; });
+                        }
+                      }
+                    });
+                    citynames.initialize();
+
+//                    $('.bootstrap-tagsinput input').tagsinput({
+//                      typeaheadjs: {
+//                        name: 'citynames',
+//                        displayKey: 'name',
+//                        valueKey: 'name',
+//                        source: citynames.ttAdapter()
+//                      }
+//                    });
+                                });
         </script>
 </body>
 

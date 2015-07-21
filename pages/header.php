@@ -29,6 +29,7 @@ if(!isset($_SESSION['logged'])) {
     <link rel="stylesheet" href="//blueimp.github.io/Gallery/css/blueimp-gallery.min.css">
     <link rel="stylesheet" href="../dist/css/bootstrap-image-gallery.min.css">
     <link href="../dist/css/bootstrap-timepicker.min.css" type="text/css" rel="stylesheet" />
+    <link href="../dist/css/bootstrap-tagsinput.css" type="text/css" rel="stylesheet" />
     <style>
         #links img {
             height: 60px;
