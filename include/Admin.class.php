@@ -89,11 +89,11 @@ class Admin {
         return $qh->fetch(PDO::FETCH_ASSOC);
     }
     
-    public function getCity($district,$country_name,$active = "1") {
+    public function getCity($district,$country_code,$active = "1") {
 
-        $query = "SELECT `ID`, `Name` FROM `city` WHERE `District` = :district AND `CountryCode` = (SELECT `Code` FROM `country` WHERE `Name` = :country_name) AND `active` = :active";
+        $query = "SELECT `ID`, `Name` FROM `city` WHERE `District` = :district AND `CountryCode` = :country_code AND `active` = :active";
 
-        $qh = $this->con->getQueryHandler($query, array("district"=>$district,"country_name"=>$country_name,"active" => $active));
+        $qh = $this->con->getQueryHandler($query, array("district"=>$district,"country_code"=>$country_code,"active" => $active));
         $data = array();
         while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
             $data[] = $res;
@@ -102,11 +102,11 @@ class Admin {
         return $data;
     }
     
-    public function getState($country_name,$active = "1") {
+    public function getState($country_code,$active = "1") {
 
-        $query = "SELECT DISTINCT `District` FROM `city` WHERE `CountryCode` = (SELECT `Code` FROM `country` WHERE `Name` = :country_name) AND `active` = :active";
+        $query = "SELECT DISTINCT `District` FROM `city` WHERE `CountryCode` = :country_code AND `active` = :active";
 
-        $qh = $this->con->getQueryHandler($query, array("country_name"=>$country_name,"active" => $active));
+        $qh = $this->con->getQueryHandler($query, array("country_code"=>$country_code,"active" => $active));
         $data = array();
         while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
             $data[] = $res;
@@ -152,11 +152,34 @@ class Admin {
         return $id;
     }
     
+    
+    public function checkTagHotelXref($tag_id,$hotel_id) {
+
+        $query = "SELECT COUNT(*) AS total FROM `bb_tag_hotel_xref` WHERE `tag_id` = :tag_id AND `hotel_id` = :hotel_id";
+
+        $qh = $this->con->getQueryHandler($query, array("tag_id"=>$tag_id,"hotel_id"=>$hotel_id));
+        
+        $res = $qh->fetch(PDO::FETCH_ASSOC);
+            
+        return ($res['total'] == 0)?true:false;
+    }
+    
     public function insertTagHotelXref($tag_id,$hotel_id) {
 
         $query = "INSERT INTO `bb_tag_hotel_xref`(`tag_id`, `hotel_id`) VALUES (:tag_id,:hotel_id)";
 
         $bindParams = array("tag_id" => $tag_id, "hotel_id" => $hotel_id);
+
+        $id = $this->con->insertQuery($query, $bindParams);
+
+        return $id;
+    }
+    
+    public function deleteTagHotelXref($hotel_id) {
+
+        $query = "DELETE FROM `bb_tag_hotel_xref` WHERE `hotel_id` = :hotel_id";
+
+        $bindParams = array("hotel_id" => $hotel_id);
 
         $id = $this->con->insertQuery($query, $bindParams);
 
@@ -388,25 +411,25 @@ class Admin {
     }
     
     
-    public function insertHotelDetails($hotel_id, $hotel_field_id, $hotel_field_val) {
+    public function insertHotelDetails($hotel_id, $hotel_field_id, $hotel_field_val,$hotel_field_norm) {
 
-        $query = "INSERT INTO `bb_hotel_details`(`hotel_id`, `hotel_field_id`, `hotel_field_val`, `active`) "
+        $query = "INSERT INTO `bb_hotel_details`(`hotel_id`, `hotel_field_id`, `hotel_field_val`, `hotel_field_norm`, `active`) "
                 . "VALUES "
-                . "(:hotel_id, :hotel_field_id, :hotel_field_val,:active)";
+                . "(:hotel_id, :hotel_field_id, :hotel_field_val,:hotel_field_norm, :active)";
 
-        $bindParams = array("hotel_id" => $hotel_id,"hotel_field_id"=>$hotel_field_id,"hotel_field_val"=>$hotel_field_val, "active" => "1");
+        $bindParams = array("hotel_id" => $hotel_id,"hotel_field_id"=>$hotel_field_id,"hotel_field_val"=>$hotel_field_val, "hotel_field_norm"=>$hotel_field_norm, "active" => "1");
 
         $id = $this->con->insertQuery($query, $bindParams);
 
         return $id;
     }
     
-    public function updateHotelDetails($hotel_id, $hotel_field_id, $hotel_field_val) {
+    public function updateHotelDetails($hotel_id, $hotel_field_id, $hotel_field_val, $hotel_field_norm) {
 
-        $query = "UPDATE `bb_hotel_details` SET `hotel_field_val`=:hotel_field_val WHERE "
+        $query = "UPDATE `bb_hotel_details` SET `hotel_field_val`=:hotel_field_val,`hotel_field_norm` = :hotel_field_norm WHERE "
                 . "`hotel_id` = :hotel_id AND `hotel_field_id` = :hotel_field_id";
 
-        $bindParams = array("hotel_id" => $hotel_id,"hotel_field_id"=>$hotel_field_id,"hotel_field_val"=>$hotel_field_val);
+        $bindParams = array("hotel_id" => $hotel_id,"hotel_field_id"=>$hotel_field_id,"hotel_field_val"=>$hotel_field_val, "hotel_field_norm"=>$hotel_field_norm);
 
         $id = $this->con->insertQuery($query, $bindParams);
 
@@ -578,13 +601,13 @@ class Admin {
 
         if($cover_pic != "") {
             $query = "UPDATE `bb_advertisement` "
-                    . "SET `ad_hotel_id`=:hotel_id,`ad_cover_pic`=:cover_pic,`ad_type_id`=:type_id,`ad_start_date`=:start_date,`ad_end_date`=:end_date "
+                    . "SET `ad_hotel_id`=:hotel_id,`ad_cover_pic`=:cover_pic,`ad_type_id`=:type_id,`ad_start_date`=:start_date,`ad_end_date`=:end_date, `updated_date` = NOW() "
                     . "WHERE `ad_id` = :ad_id";
 
             $bindParams = array("hotel_id" => $hotel_id,"cover_pic"=>$cover_pic,"type_id"=>$type_id,"start_date"=>$start_date,"end_date"=>$end_date,"ad_id"=>$ad_id);
         } else {
             $query = "UPDATE `bb_advertisement` "
-                    . "SET `ad_hotel_id`=:hotel_id,`ad_type_id`=:type_id,`ad_start_date`=:start_date,`ad_end_date`=:end_date "
+                    . "SET `ad_hotel_id`=:hotel_id,`ad_type_id`=:type_id,`ad_start_date`=:start_date,`ad_end_date`=:end_date, `updated_date` = NOW() "
                     . "WHERE `ad_id` = :ad_id";
 
             $bindParams = array("hotel_id" => $hotel_id,"type_id"=>$type_id,"start_date"=>$start_date,"end_date"=>$end_date,"ad_id"=>$ad_id);

@@ -51,6 +51,13 @@ if(isset($_POST['form_submit'])) {
     }
     $takeaway = isset($_POST['takeaway'])?$_POST['takeaway']:"no";
     
+    $city_hide = isset($_POST['city_hide'])?$_POST['city_hide']:"";
+    $state_hide = isset($_POST['state_hide'])?$_POST['state_hide']:"";
+    $country_hide = isset($_POST['country_hide'])?$_POST['country_hide']:"";
+    $type_hide = isset($_POST['type_hide'])?$_POST['type_hide']:"";
+    $cuisine_hide = isset($_POST['cuisine_hide'])?$_POST['cuisine_hide']:"";
+    $seating_hide = isset($_POST['seating_hide'])?$_POST['seating_hide']:"";
+    
     $field_id[] = "2";
     $field_id[] = "3";
     $field_id[] = "4";
@@ -80,7 +87,7 @@ if(isset($_POST['form_submit'])) {
     $field_id[] = "28";
     $field_id[] = "29";
     
-    $field_val[] = $rest_desc;
+    $field_val[] = trim($rest_desc);
     $field_val[] = $type;
     $field_val[] = $address;
     $field_val[] = $area;
@@ -108,6 +115,35 @@ if(isset($_POST['form_submit'])) {
     $field_val[] = $hh_opening_time;
     $field_val[] = $hh_closing_time;
     $field_val[] = $takeaway;
+    
+    $field_norm[] = $rest_desc;
+    $field_norm[] = $type_hide;
+    $field_norm[] = $address;
+    $field_norm[] = $area;
+    $field_norm[] = $city_hide;
+    $field_norm[] = $state_hide;
+    $field_norm[] = $country_hide;
+    $field_norm[] = $phone_main;
+    $field_norm[] = $phone_alt;
+    $field_norm[] = implode(",",$serves);
+    $field_norm[] = $alcohol;
+    $field_norm[] = $seating_hide;
+    $field_norm[] = implode(",",$menu_sel);
+    $field_norm[] = $banquet;
+    $field_norm[] = $opening_time;
+    $field_norm[] = $closing_time;
+    $field_norm[] = $visitor_attraction;
+    $field_norm[] = $cuisine_hide;
+    $field_norm[] = $delivery;
+    $field_norm[] = $value_for_2;
+    $field_norm[] = $cover_pic;
+    $field_norm[] = $zip_code;
+    $field_norm[] = $happy_hours;
+    $field_norm[] = $wifi;
+    $field_norm[] = $airconditioned;
+    $field_norm[] = $hh_opening_time;
+    $field_norm[] = $hh_closing_time;
+    $field_norm[] = $takeaway;
     //var_dump($field_val);
     
 //    if($rest_name != "") {
@@ -121,20 +157,38 @@ if(isset($_POST['form_submit'])) {
                 $adminObj->updateHotel($hotel_name, $hotel_id,$rest_id);                
                 for($i=0;$i<count($field_id);$i++) {
                     //var_dump(array($hotel_id, $field_id[$i], $field_val[$i]));
+                    if($field_id[$i] == "2") {
+                        $field_val[$i] = trim($field_val[$i]);
+                        $tag_arr = explode(",",$field_val[$i]);
+                        $adminObj->deleteTagHotelXref($hotel_id);
+                        foreach($tag_arr as $tag_name) {
+                            $tag_name = trim($tag_name);
+                            $tag_id = $adminObj->checkTagName($tag_name);
+                            if($tag_id == 0) {
+                                $tag_id = $adminObj->insertTagName($tag_name);
+                            }
+
+                            if($adminObj->checkTagHotelXref($tag_id, $hotel_id)) {
+                                $adminObj->insertTagHotelXref($tag_id, $hotel_id);
+                            }
+                        }
+
+                     }
                     if($adminObj->getHotelDetailsID($hotel_id, $field_id[$i])) {
+                        
                         if($field_id[$i] == "22") {
                             $ac_image_path = $adminObj->uploadFile($field_val[$i], "cover_pic");
-                            $adminObj->updateHotelDetails($hotel_id, $field_id[$i], $ac_image_path);
+                            $adminObj->updateHotelDetails($hotel_id, $field_id[$i], $ac_image_path,$ac_image_path);
                         } else {
-                            $adminObj->updateHotelDetails($hotel_id, $field_id[$i], $field_val[$i]);
+                            $adminObj->updateHotelDetails($hotel_id, $field_id[$i], $field_val[$i],$field_norm[$i]);
                         }
                     } else {
                         if($field_id[$i] == "22") {
                             $ac_image_path = $adminObj->uploadFile($field_val[$i], "cover_pic");
-                            $adminObj->insertHotelDetails($hotel_id, $field_id[$i], $ac_image_path);
-                         } else {
-                            $adminObj->insertHotelDetails($hotel_id, $field_id[$i], $field_val[$i]);
-                         }
+                            $adminObj->insertHotelDetails($hotel_id, $field_id[$i], $ac_image_path,$ac_image_path);
+                        } else {
+                           $adminObj->insertHotelDetails($hotel_id, $field_id[$i], $field_val[$i],$field_norm[$i]);
+                        }
                     }
                 }
                 if(!(count($alacarte_menu['name']) == 1 && $alacarte_menu['name'][0] == '')) {
@@ -423,7 +477,7 @@ foreach($details as $detail) {
                             <?php } ?>
                             <div class="row">
                                 <div class="col-lg-6">
-                                    <form role="form" action="edit_single_rest.php" method="post" enctype="multipart/form-data">
+                                    <form role="form" action="edit_single_rest.php" id="create_form" method="post" enctype="multipart/form-data">
                                         <div class="form-group">
                                             <label>Name of the Hotel</label>
                                             <select  name="rest_id" class="form-control">
@@ -446,7 +500,7 @@ foreach($details as $detail) {
                                             <?php 
                                                 $typelist = $adminObj->getEstablishmentType();
                                                 foreach($typelist as $type_temp) {
-                                                    if($type == $type_temp['est_name']) {
+                                                    if($type == $type_temp['est_id']) {
                                                         $checked_temp = "checked";
                                                     } else {
                                                         $checked_temp = "";
@@ -454,7 +508,7 @@ foreach($details as $detail) {
                                             ?>
                                             <div class="radio">
                                                 <label>
-                                                    <input type="radio" name="type" id="optionsRadios1" <?php echo $checked_temp; ?> value="<?php echo $type_temp['est_name'] ?>" ><?php echo $type_temp['est_name'] ?>
+                                                    <input type="radio" name="type" id="optionsRadios1" <?php echo $checked_temp; ?> value="<?php echo $type_temp['est_id'] ?>" ><span><?php echo $type_temp['est_name'] ?></span>
                                                 </label>
                                             </div>
                                             
@@ -499,13 +553,13 @@ foreach($details as $detail) {
                                                 <?php
                                                 $country_arr = $adminObj->getCountry();
                                                 foreach($country_arr as $country_temp) {
-                                                    if($country_id == $country_temp['Name']) {
+                                                    if($country_id == $country_temp['Code']) {
                                                 ?>   
-                                                <option value="<?php echo $country_temp['Name'] ?>" selected="selected"><?php echo $country_temp['Name'] ?></option>
+                                                <option value="<?php echo $country_temp['Code'] ?>" selected="selected"><?php echo $country_temp['Name'] ?></option>
                                                 <?php
                                                     } else {
                                                 ?>
-                                                    <option value="<?php echo $country_temp['Name'] ?>"><?php echo $country_temp['Name'] ?></option>
+                                                    <option value="<?php echo $country_temp['Code'] ?>"><?php echo $country_temp['Name'] ?></option>
                                                 <?php 
                                                     }
                                                 }
@@ -541,13 +595,13 @@ foreach($details as $detail) {
                                                 <?php 
                                                $city_arr = $adminObj->getCity($state_id, $country_id);
                                                 foreach($city_arr as $city_temp) {
-                                                    if($city_id == $city_temp['Name']) {
+                                                    if($city_id == $city_temp['ID']) {
                                                 ?>
-                                               <option value="<?php echo $city_temp['Name'] ?>" selected="selected"><?php echo $city_temp['Name'] ?></option>
+                                               <option value="<?php echo $city_temp['ID'] ?>" selected="selected"><?php echo $city_temp['Name'] ?></option>
                                                 <?php
                                                     } else {
                                                 ?>
-                                                    <option value="<?php echo $city_temp['Name'] ?>"><?php echo $city_temp['Name'] ?></option>
+                                                    <option value="<?php echo $city_temp['ID'] ?>"><?php echo $city_temp['Name'] ?></option>
                                                 <?php 
                                                     }
                                                 }
@@ -567,11 +621,11 @@ foreach($details as $detail) {
                                                 <?php 
                                                 $cuisinelist = $adminObj->getCuisines(); 
                                                 foreach($cuisinelist as $cuisine) {
-                                                    if(in_array($cuisine['name'], $cuisines_arr)) {                                                       
+                                                    if(in_array($cuisine['id'], $cuisines_arr)) {                                                       
                                                 ?>
-                                                    <option value="<?php echo $cuisine['name']; ?>" selected><?php echo $cuisine['name']; ?></option>
+                                                    <option value="<?php echo $cuisine['id']; ?>" selected><?php echo $cuisine['name']; ?></option>
                                                 <?php } else { ?>
-                                                    <option value="<?php echo $cuisine['name']; ?>"><?php echo $cuisine['name']; ?></option>
+                                                    <option value="<?php echo $cuisine['id']; ?>"><?php echo $cuisine['name']; ?></option>
                                                 <?php        } 
                                                 }?>
                                             </select>
@@ -691,7 +745,7 @@ foreach($details as $detail) {
                                             <?php 
                                             $seating_arr_temp = $adminObj->getSeating(); 
                                             foreach($seating_arr_temp as $seating) {
-                                                if(in_array($seating['seating_name'], $seating_arr)) {
+                                                if(in_array($seating['seating_id'], $seating_arr)) {
                                                     $checked = "checked";
                                                 } else {
                                                     $checked = "";
@@ -699,7 +753,7 @@ foreach($details as $detail) {
                                             ?>
                                             <div class="checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="seating[]" value="<?php echo $seating['seating_name'] ?>" <?php echo $checked ?>><?php echo $seating['seating_name'] ?>
+                                                    <input type="checkbox" name="seating[]" value="<?php echo $seating['seating_id'] ?>" <?php echo $checked ?>><span><?php echo $seating['seating_name'] ?></span>
                                                 </label>
                                             </div>                                            
                                             <?php } ?>
@@ -882,7 +936,10 @@ foreach($details as $detail) {
                                         <input type="hidden" name="form_submit" value="1" />
                                         <input type="hidden" name="city_hide" />   
                                         <input type="hidden" name="state_hide" />   
-                                        <input type="hidden" name="country_hide" />   
+                                        <input type="hidden" name="country_hide" />
+                                        <input type="hidden" name="type_hide" />
+                                        <input type="hidden" name="cuisine_hide" />
+                                        <input type="hidden" name="seating_hide" />  
                                         <button type="submit" class="btn btn-default">Submit Button</button>
                                         <button id="cancel" class="btn btn-default">Cancel</button>
                                     </form>
@@ -1066,23 +1123,42 @@ foreach($details as $detail) {
                             $.each(myOptions, function(val,text) {
                                 //console.log(text);
                                  mySelect.append(
-                                     $('<option></option>').val(text.Name).html(text.Name)
+                                     $('<option></option>').val(text.ID).html(text.Name)
                                  );
                              });
                         });
                     });
 
-//                    $('#create_form').on('submit', function(e){
-//                        //e.preventDefault();
-//                        var country = $( "select[name=country] option:selected" ).html();
-//                        var state = $( "select[name=state] option:selected" ).html();
-//                        var city = $( "select[name=city] option:selected" ).html();
-//                        console.log(country+"--"+state+"--"+city);
-//                        $("input[name=country_hide]").val(country);
-//                        $("input[name=state_hide]").val(state);
-//                        $("input[name=city_hide]").val(city);
-//                    });
-//                    
+                    $('#create_form').on('submit', function(e){
+                        //e.preventDefault();
+                        var country = $( "select[name=country] option:selected" ).html();
+                        var state = $( "select[name=state] option:selected" ).html();
+                        var city = $( "select[name=city] option:selected" ).html();
+                        var type = $( "input[name=type]:checked" ).next().html();
+                        var cuisine = new Array();
+                        var seating = new Array();
+                        $( "select[name='cuisine[]'] option:selected" ).each(function(i, selected){ 
+                            cuisine.push($(selected).text()); 
+                          });
+
+                          $( "input[name='seating[]']:checked" ).each(function(i, selected){ 
+                            seating.push($(selected).next().html()); 
+                          });
+
+                        var cuisine_join = cuisine.join(",");
+                        var seating_join = seating.join(",");
+                        
+                        //console.log(country+"---"+city+"---"+state+"---"+type+"---"+cuisine_join+"---"+seating_join+"---")
+                        
+                        $("input[name=country_hide]").val(country);
+                        $("input[name=state_hide]").val(state);
+                        $("input[name=city_hide]").val(city);
+                        $("input[name=type_hide]").val(type);
+                        $("input[name=cuisine_hide]").val(cuisine_join);
+                        $("input[name=seating_hide]").val(seating_join);
+                    });
+                
+                
                     var citynames = new Bloodhound({
                       datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
                       queryTokenizer: Bloodhound.tokenizers.whitespace,

@@ -6,7 +6,9 @@ include '../include/Admin.class.php';
 include './header.php'; 
 
 $timezone = $_SESSION['time'];
-$timezone += 60;
+if($timezone != "") {
+    //$timezone += 60;
+}
 $adminObj = new Admin();
 $error = "";
 $ad_id_get = $adv_arr = $hotel_id_temp = $ad_cover_temp = $ad_start_date_temp = $ad_end_date_temp = "";
@@ -19,8 +21,8 @@ if(isset($_GET['ad_id'])) {
         $hotel_id_temp = $adv_arr['ad_hotel_id'];
         $ad_cover_temp = $adv_arr['ad_cover_pic'];
         $ad_type_id_temp = $adv_arr['ad_type_id'];    
-        $ad_start_date_temp = date('Y-m-d h:i', strtotime("-$timezone minutes", strtotime($adv_arr['ad_start_date'])));
-        $ad_end_date_temp = date('Y-m-d h:i', strtotime("-$timezone minutes", strtotime($adv_arr['ad_end_date'])));
+        $ad_start_date_temp = date('Y-m-d h:i', strtotime("+$timezone minutes", strtotime($adv_arr['ad_start_date'])));
+        $ad_end_date_temp = date('Y-m-d h:i', strtotime("+$timezone minutes", strtotime($adv_arr['ad_end_date'])));
         $form_submit = 2;
     } else {
         $error = "Hotel does not exist";
@@ -35,8 +37,8 @@ if(isset($_POST['form_submit'])) {
     $end_date = isset($_POST['end_date'])?$_POST['end_date']:"";   
     $cover_pic = $_FILES['cover_pic'];
     
-    $start_date_final = date('Y-m-d h:i', strtotime("+$timezone minutes", strtotime($start_date)));
-    $end_date_final = date('Y-m-d h:i', strtotime("+$timezone minutes", strtotime($end_date)));
+    $start_date_final = date('Y-m-d h:i', strtotime("-$timezone minutes", strtotime($start_date)));
+    $end_date_final = date('Y-m-d h:i', strtotime("-$timezone minutes", strtotime($end_date)));
     $form_submit_temp = $_POST['form_submit'];
     if($form_submit_temp == "1") {    
         if($adminObj->checkHotelInAd($hotel_id, $type_id)) {
