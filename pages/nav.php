@@ -261,10 +261,14 @@
                             <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i>Advertisement<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
-                                    <a href="add_advertisement.php"><i class="fa fa-table fa-fw"></i> Add Advertisement</a>
+                                    <a href="add_advertisement.php"><i class="fa fa-table fa-fw"></i> Add Trending Advertisement</a>
                                 </li>
                                 <li>
-                                    <a href="edit_advertisement.php"><i class="fa fa-table fa-fw"></i> Edit Advertisement</a>
+                                    <a href="edit_advertisement.php"><i class="fa fa-table fa-fw"></i> Edit Trending Advertisement</a>
+                                </li>
+                                
+                                <li>
+                                    <a href="add_sponsored_ads.php"><i class="fa fa-table fa-fw"></i> Add Sponsored Advertisement</a>
                                 </li>
                             </ul>
                             <!-- /.nav-second-level -->

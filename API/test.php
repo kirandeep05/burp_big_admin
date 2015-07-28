@@ -31,6 +31,16 @@ and open the template in the editor.
         
         <form action="index.php" method="post">
         <fieldset>
+            <legend>Sponsored Ads</legend>
+            <table>
+                <tr><td><input type="text" name="city_id" /></td></tr>
+                <tr><td><input type="hidden" name="type" value="sponsored_ads" /><input type="submit" value="Get" /></td></tr>
+            </table>
+        </fieldset>
+        </form>
+        
+        <form action="index.php" method="post">
+        <fieldset>
             <legend>Get Cities</legend>
             <table>                
                 <tr><td><input type="hidden" name="type" value="get_cities" /><input type="submit" value="Get" /></td></tr>
@@ -58,6 +68,16 @@ and open the template in the editor.
             </table>
         </fieldset>
         </form>
+
+         <form action="index.php" method="post">
+                <fieldset>
+                    <legend>Search Hotel By Text</legend>
+                    <table>
+                        <tr><td>Search</td><td><input type="text" name="search_value" /></td></tr>
+                        <tr><td><input type="hidden" name="type" value="search" /><input type="submit" value="Get" /></td></tr>
+                    </table>
+                </fieldset>
+                </form>
         
     </body>
 </html>

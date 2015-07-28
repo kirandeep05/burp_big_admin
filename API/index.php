@@ -15,6 +15,7 @@ function __autoload($classname) {
     include $classname . ".class.php";
 }
 $restObj = new Restaurant();
+$searchObj = new Search();
 $type = $_POST["type"];
 switch ($type) {
     case "quick_search":            
@@ -35,10 +36,24 @@ switch ($type) {
             }
             echo str_replace("\/", "/", json_encode(array("ads"=>$trending_ads,"log"=>$log)));
             
-        break;     
+        break;
+        
+    case "sponsored_ads": 
+            $city_id = isset($_POST['city_id'])?$_POST['city_id']:"0";
+            $city_id_arr = explode(",", $city_id);
+            $sponsored_ads = $restObj->getSponsoredAds($city_id_arr);
+            if(empty($sponsored_ads)) {
+                $log = "0";
+            } else {
+                $log = "1";
+            }
+            echo str_replace("\/", "/", json_encode(array("ads"=>$sponsored_ads,"log"=>$log)));
+            
+        break;      
         
     case "get_cities":            
-        $cities = $restObj->getCities();
+        $cities = array();
+        //$cities = $restObj->getCities();
         $groups = $restObj->getCitiesGroup();
         foreach($groups as $group) {
             $group_coallate[$group['group_name']][] = $group['city_id'] ;
@@ -99,7 +114,7 @@ switch ($type) {
             $data['not_available'] = $not_available;
             $menu_arr = $restObj->getMenu($hotel_id);
 
-            $data['menu']['A la Carte'] = array();
+            $data['menu']['Ala_Carte'] = array();
             $data['menu']['Buffet'] = array();
             $data['menu']['Bar'] = array();
             foreach($menu_arr as $menu) {
@@ -215,7 +230,19 @@ switch ($type) {
         echo str_replace("\/", "/", json_encode($final_data));
         
     break;
-    
+
+      case "search":
+                $search_value = isset($_POST['search_value'])?$_POST['search_value']:"";
+                $hotel_ids = $searchObj->getHotelIdsFromSearchValues($search_value);
+                $hotels = array();
+                $log = 0;
+                if (!empty($hotel_ids)){
+                 $log = 1;
+                 $hotels = $restObj->getSingleRestDetail($hotel_ids);
+                }
+                echo str_replace("\/", "/", json_encode(array("result"=>$hotels,"count"=>count($hotels),"log"=>$log)));
+
+            break;
     
     default: 
         echo "Default";

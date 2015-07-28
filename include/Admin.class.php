@@ -102,6 +102,33 @@ class Admin {
         return $data;
     }
     
+    public function getHotelFromCityIds($city_ids,$active = "1") {
+
+        $query = "SELECT `ID`, `Name` FROM `city` WHERE `ID` IN ($city_ids) AND `active` = :active";
+
+        $qh = $this->con->getQueryHandler($query, array("active" => $active));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res;
+        }
+
+        return $data;
+    }
+    
+    public function getActiveCitiesGroup($active = "1") {
+
+        $query = "SELECT `city_group_id`, `city_id`, `group_name` FROM `bb_city_group` cg, `bb_city_group_name` cgn "
+                . "WHERE `active` = :active AND cg.`city_group_id` = cgn.`group_id`";
+
+        $qh = $this->con->getQueryHandler($query, array("active" => $active));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res;
+        }
+
+        return $data;
+    }
+    
     public function getState($country_code,$active = "1") {
 
         $query = "SELECT DISTINCT `District` FROM `city` WHERE `CountryCode` = :country_code AND `active` = :active";
@@ -544,6 +571,21 @@ class Admin {
         return $data;
     }
     
+    public function getHotelDetailsFromCityId($city_id) {
+
+        $query = "SELECT hd.`hotel_id`,`hotel_name` FROM `bb_hotel_details` hd, `bb_hotel` bh "
+                . "WHERE hd.`hotel_id` = bh.`hotel_id` "
+                . "AND `hotel_field_id` = 6 AND `hotel_field_val` IN ($city_id)";
+
+        $qh = $this->con->getQueryHandler($query, array());
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res;
+        }
+
+        return $data;
+    }
+    
     public function uploadFile($file,$type) {
 
 
@@ -585,12 +627,20 @@ class Admin {
         return $data;
     }
 
-    public function insertAdvertisement($hotel_id,$cover_pic,$type_id,$start_date,$end_date) {
+    public function insertAdvertisement($hotel_id,$cover_pic,$type_id,$start_date,$end_date,$strip = "0", $order = "0") {
 
-        $query = "INSERT INTO `bb_advertisement`(`ad_hotel_id`, `ad_cover_pic`, `ad_type_id`, `ad_start_date`, `ad_end_date`) "
-                . "VALUES (:hotel_id,:cover_pic,:type_id,:start_date,:end_date)";
+        $query = "INSERT INTO `bb_advertisement`(`ad_hotel_id`, `ad_cover_pic`, `ad_type_id`, `ad_start_date`, `ad_end_date`, `strip`, `order`) "
+                . "VALUES (:hotel_id,:cover_pic,:type_id,:start_date,:end_date,:strip,:order)";
 
-        $bindParams = array("hotel_id" => $hotel_id,"cover_pic"=>$cover_pic,"type_id"=>$type_id,"start_date"=>$start_date,"end_date"=>$end_date);
+        $bindParams = array(
+            "hotel_id" => $hotel_id,
+            "cover_pic"=>$cover_pic,
+            "type_id"=>$type_id,
+            "start_date"=>$start_date,
+            "end_date"=>$end_date,
+            "strip"=>$strip,
+            "order"=>$order
+                );
 
         $id = $this->con->insertQuery($query, $bindParams);
 

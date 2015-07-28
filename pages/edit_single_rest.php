@@ -58,6 +58,7 @@ if(isset($_POST['form_submit'])) {
     $cuisine_hide = isset($_POST['cuisine_hide'])?$_POST['cuisine_hide']:"";
     $seating_hide = isset($_POST['seating_hide'])?$_POST['seating_hide']:"";
     
+    $field_id[] = "1";
     $field_id[] = "2";
     $field_id[] = "3";
     $field_id[] = "4";
@@ -87,6 +88,7 @@ if(isset($_POST['form_submit'])) {
     $field_id[] = "28";
     $field_id[] = "29";
     
+    $field_val[] = $hotel_name;
     $field_val[] = trim($rest_desc);
     $field_val[] = $type;
     $field_val[] = $address;
@@ -116,6 +118,7 @@ if(isset($_POST['form_submit'])) {
     $field_val[] = $hh_closing_time;
     $field_val[] = $takeaway;
     
+    $field_norm[] = $hotel_name;
     $field_norm[] = $rest_desc;
     $field_norm[] = $type_hide;
     $field_norm[] = $address;
