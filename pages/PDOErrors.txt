@@ -1,0 +1,7 @@
+exception 'PDOException' with message 'SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it.
+' in C:\wamp\www\startbootstrap-sb-admin-2-1.0.7\startbootstrap-sb-admin-2-1.0.7\include\Connection.class.php:27
+Stack trace:
+#0 C:\wamp\www\startbootstrap-sb-admin-2-1.0.7\startbootstrap-sb-admin-2-1.0.7\include\Connection.class.php(27): PDO->__construct('mysql:host=loca...', 'root', '')
+#1 C:\wamp\www\startbootstrap-sb-admin-2-1.0.7\startbootstrap-sb-admin-2-1.0.7\include\Admin.class.php(15): Connection->__construct()
+#2 C:\wamp\www\startbootstrap-sb-admin-2-1.0.7\startbootstrap-sb-admin-2-1.0.7\pages\login.php(7): Admin->__construct()
+#3 {main}

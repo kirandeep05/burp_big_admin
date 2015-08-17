@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-include_once '../include/Connection.class.php';
+//include_once '../include/Connection.class.php';
 
 class Search {
 
@@ -17,10 +17,12 @@ class Search {
         $this->con = new Connection();
     }
 
-    public function getHotelIdsFromSearchValues($search_value) {
+    public function getHotelIdsFromSearchValues($search_value,$limit = "",$filter = array()) {
 
         $searchArray = explode(" ",$search_value);
         $countSearchArray = count($searchArray);
+        $bindParams = "";
+        
         if ($countSearchArray > 1 )
         {
             $bindParamsValue= array();
@@ -28,11 +30,22 @@ class Search {
                 $bindParamsValue[] =" hotel_field_norm LIKE '%".$searchArray[$i]."%' ";
             }
             $bindParams = implode(" AND ",$bindParamsValue);
-            }else{
+        }else{
             $bindParams = "hotel_field_norm LIKE '%".$search_value."%'";
         }
-
-        $query = "SELECT DISTINCT(`hotel_id`) FROM `bb_hotel_details` WHERE ".$bindParams ;
+        $filter_val = (empty($filter))?"":" AND ";  
+        $filter_arr = array();
+        if(!empty($filter)) {
+            foreach($filter as $key=>$val) {
+                $filter_arr[] = " (hotel_field_id = $key AND hotel_field_norm REGEXP '$val')";
+            }
+        }
+        $filter_val .= implode(" AND ", $filter_arr);
+        $limit_query = "";
+        if($limit != "") {
+            $limit_query = " LIMIT ".$limit;
+        }
+        $query = "SELECT DISTINCT(`hotel_id`) FROM `bb_hotel_details` WHERE ".$bindParams.$filter_val.$limit_query ;        
         $qh = $this->con->getQueryHandler($query, array());
         $data = array();
         while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
@@ -41,5 +54,34 @@ class Search {
         $hotel_ids = implode(",",$data);
         return $data;
     }
+    
+    public function getSearchSuggestions($search_value) {
+
+        $searchArray = explode(" ",$search_value);
+        $countSearchArray = count($searchArray);
+        if ($countSearchArray > 1 )
+        {
+            $bindParamsValue= array();
+            for ($i=0;$i<$countSearchArray;$i++){
+                $bindParamsValue[] =" LOWER(hotel_field_norm) LIKE LOWER('%".$searchArray[$i]."%') ";
+            }
+            $bindParams = implode(" AND ",$bindParamsValue);
+            }else{
+            $bindParams = "LOWER(hotel_field_norm) LIKE LOWER('%".$search_value."%')";
+        }
+
+        $query = "SELECT DISTINCT `hotel_field_norm` AS val,  `field_name` AS type FROM `bb_hotel_details` hd,`bb_hotel_fields` hf WHERE ".$bindParams." "
+                . "AND hd.`hotel_field_id` = hf.`field_id` AND hd.`hotel_field_id` NOT IN (22) AND "
+                . "`hotel_id` IN "
+                . "(SELECT `hotel_id` FROM `bb_hotel_details` WHERE `hotel_field_id` = '6' AND `hotel_field_val` IN (1073,4080,4081,4082,1,2,3) )" ;
+        $qh = $this->con->getQueryHandler($query, array());
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_NUM)) {
+            $data[] = $res;
+        }        
+        return $data;
+    }
+    
+    
 
 }

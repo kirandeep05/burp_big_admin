@@ -129,6 +129,21 @@ class Admin {
         return $data;
     }
     
+    public function getSponsCitiesGroup($active = "1") {
+
+        $query = "SELECT `city_group_id`, `city_id`, `group_name` FROM `bb_city_group` cg, `bb_city_group_name` cgn WHERE `active` = :active "
+                . "AND cg.`city_group_id` = cgn.`group_id` "
+                . "AND `group_name` <> (SELECT DISTINCT `city_group_name` FROM `bb_advertisement` WHERE `ad_type_id` = '2')";
+
+        $qh = $this->con->getQueryHandler($query, array("active" => $active));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res;
+        }
+
+        return $data;
+    }
+    
     public function getState($country_code,$active = "1") {
 
         $query = "SELECT DISTINCT `District` FROM `city` WHERE `CountryCode` = :country_code AND `active` = :active";
@@ -586,6 +601,19 @@ class Admin {
         return $data;
     }
     
+     public function getSponsoredAdsCity() {
+
+        $query = "SELECT DISTINCT(`city_group_name`) AS city FROM `bb_advertisement` WHERE `ad_type_id` = '2'";
+
+        $qh = $this->con->getQueryHandler($query, array());
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res;
+        }
+
+        return $data;
+    }
+    
     public function uploadFile($file,$type) {
 
 
@@ -627,10 +655,10 @@ class Admin {
         return $data;
     }
 
-    public function insertAdvertisement($hotel_id,$cover_pic,$type_id,$start_date,$end_date,$strip = "0", $order = "0") {
+    public function insertAdvertisement($hotel_id,$cover_pic,$type_id,$start_date,$end_date,$city_group_name = "0", $strip = "0", $order = "0", $text = "") {
 
-        $query = "INSERT INTO `bb_advertisement`(`ad_hotel_id`, `ad_cover_pic`, `ad_type_id`, `ad_start_date`, `ad_end_date`, `strip`, `order`) "
-                . "VALUES (:hotel_id,:cover_pic,:type_id,:start_date,:end_date,:strip,:order)";
+        $query = "INSERT INTO `bb_advertisement`(`ad_hotel_id`, `ad_cover_pic`, `ad_type_id`, `ad_start_date`, `ad_end_date`, `city_group_name`,`strip`, `order`,`text`) "
+                . "VALUES (:hotel_id,:cover_pic,:type_id,:start_date,:end_date,:city_group_name,:strip,:order,:text)";
 
         $bindParams = array(
             "hotel_id" => $hotel_id,
@@ -638,8 +666,10 @@ class Admin {
             "type_id"=>$type_id,
             "start_date"=>$start_date,
             "end_date"=>$end_date,
+            "city_group_name"=>$city_group_name,
             "strip"=>$strip,
-            "order"=>$order
+            "order"=>$order,
+            "text"=>$text
                 );
 
         $id = $this->con->insertQuery($query, $bindParams);
@@ -651,7 +681,7 @@ class Admin {
 
         if($cover_pic != "") {
             $query = "UPDATE `bb_advertisement` "
-                    . "SET `ad_hotel_id`=:hotel_id,`ad_cover_pic`=:cover_pic,`ad_type_id`=:type_id,`ad_start_date`=:start_date,`ad_end_date`=:end_date, `updated_date` = NOW() "
+                    . "SET `ad_hotel_id`=:hotel_id,`ad_cover_pic`=:cover_pic,`ad_type_id`=:type_id,`ad_start_date`= :start_date,`ad_end_date`= :end_date, `updated_date` = NOW()"
                     . "WHERE `ad_id` = :ad_id";
 
             $bindParams = array("hotel_id" => $hotel_id,"cover_pic"=>$cover_pic,"type_id"=>$type_id,"start_date"=>$start_date,"end_date"=>$end_date,"ad_id"=>$ad_id);
@@ -667,6 +697,60 @@ class Admin {
         return $id;
     }
     
+    public function updateSponsoredAdvertisement($hotel_id,$cover_pic,$start_date,$end_date,$city_group_name,$strip,$order,$text) {
+
+        if($cover_pic != "") {
+            $query = "UPDATE `bb_advertisement` SET "
+                    . "`ad_hotel_id`= :hotel_id,`ad_cover_pic`= :cover_pic,`ad_start_date`= :start_date,`ad_end_date`= :end_date,`updated_date`=NOW(), `text` = :text "
+                    . "WHERE `ad_type_id` = '2' AND `city_group_name` = :city_group_name AND `strip` = :strip AND `order` = :order";
+
+            $bindParams = array(
+                "hotel_id" => $hotel_id,
+                "cover_pic"=>$cover_pic,
+                "start_date"=>$start_date,
+                "end_date"=>$end_date,
+                "city_group_name"=>$city_group_name,
+                "strip"=>$strip,
+                "order"=>$order,
+                "text" => $text
+                    );
+        } else {
+            $query = "UPDATE `bb_advertisement` "
+                    . "SET `ad_hotel_id`= :hotel_id,`ad_start_date`= :start_date,`ad_end_date`= :end_date,`updated_date`=NOW(), `text` = :text "
+                    . "WHERE `ad_type_id` = '2' AND `city_group_name` = :city_group_name AND `strip` = :strip AND `order` = :order";
+
+            $bindParams = array(
+                "hotel_id" => $hotel_id,
+                "start_date" => $start_date,
+                "end_date" => $end_date,
+                "city_group_name" => $city_group_name,
+                "strip" => $strip,
+                "order" => $order,
+                "text" => $text
+                    );
+        }
+        $id = $this->con->insertQuery($query, $bindParams);
+
+        return $id;
+    }
+    
+    public function deleteSponsoredAd($strip,$order,$city_group_name) {
+
+        $query = "DELETE FROM `bb_advertisement` WHERE `ad_type_id` = '2' AND "
+                . "`strip` = :strip AND `order` = :order AND `city_group_name` = :city_group_name";
+
+        $bindParams = array(
+            "city_group_name"=>$city_group_name,
+            "strip"=>$strip,
+            "order"=>$order
+                );
+
+        $id = $this->con->insertQuery($query, $bindParams);
+
+        return $id;
+    }
+    
+    
     public function getAdvertisement() {
 
         $query = "SELECT ba.`ad_id`,ba.`ad_hotel_id`,bh.`hotel_name`, br.`rest_name`,bat.`ad_type_name` "
@@ -681,6 +765,41 @@ class Admin {
         }
 
         return $data;
+    }
+    
+    public function getSponsoredAdvertisement($city_group_name) {
+
+        $query = "SELECT `ad_id`, `ad_hotel_id`, `ad_cover_pic`, `ad_start_date`, `ad_end_date`, `strip`, `order`, `text` , `active`, `updated_date` "
+                . "FROM `bb_advertisement` "
+                . "WHERE `ad_type_id` = 2 AND `city_group_name` = :city_group_name "
+                . "ORDER BY `strip`,`order`";
+
+        $qh = $this->con->getQueryHandler($query, array("city_group_name"=>$city_group_name));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res;
+        }
+
+        return $data;
+    }
+    
+    public function checkSponsoredAdExist($strip,$order,$city_group_name) {
+
+        $query = "SELECT COUNT(*) AS total FROM "
+                . "`bb_advertisement` "
+                . "WHERE "
+                . "`strip` = :strip "
+                . "AND `order` = :order "
+                . "AND `city_group_name` = :city_group_name "
+                . "AND `ad_type_id` = '2'";
+
+        $qh = $this->con->getQueryHandler($query, array("strip"=>$strip,"order"=>$order,"city_group_name"=>$city_group_name));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data = $res;
+        }
+
+        return ($data['total'] > 0)?true:false;
     }
     
      public function getAdvertisementFromHotelID($ad_id) {

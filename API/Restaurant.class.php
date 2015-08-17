@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-include_once '../include/Connection.class.php';
+//include_once '../../include/Connection.class.php';
 
 class Restaurant {
 
@@ -65,7 +65,7 @@ class Restaurant {
 
         $strip = $this->getRandomStrip();
         $url = Constants::WEB_URL;
-        $query = "SELECT `ad_id`, `ad_hotel_id`,`hotel_name`, CONCAT('$url/admin/images/advertisement/',`ad_cover_pic`) as ad_cover_pic 
+        $query = "SELECT `ad_id`, `ad_hotel_id`,`hotel_name`, CONCAT('$url/admin/images/advertisement/',`ad_cover_pic`) as ad_cover_pic, `text` 
                     FROM `bb_advertisement` ba,`bb_hotel` bh WHERE ba.`ad_hotel_id` = bh.`hotel_id` and ba.`active` = '1' 
                     AND `ad_type_id` = '2' 
                     AND (`ad_start_date` <= NOW() AND `ad_end_date` >= NOW()) 
@@ -135,22 +135,29 @@ class Restaurant {
     
     public function getSingleRestDetail($hotel_id) {
 
-        $query = "SELECT hd.`hotel_id`,`field_name`, `hotel_field_val`,`hotel_field_norm`,`hotel_name` FROM `bb_hotel_details` hd,`bb_hotel_fields` hf,`bb_hotel` hh "
+        $query = "SELECT hd.`hotel_id`,`field_name`,`hotel_field_id`, `hotel_field_val`,`hotel_field_norm`,`hotel_name`,`rest_name` "
+                . "FROM `bb_hotel_details` hd,`bb_hotel_fields` hf,`bb_hotel` hh,`bb_rest` br "
                 . "WHERE `hotel_field_id` = `field_id` "
                 . "AND hh.`hotel_id` IN (".  implode(",", $hotel_id).")  AND "
-                . "hh.`hotel_id` = hd.`hotel_id`";
+                . "hh.`hotel_id` = hd.`hotel_id` AND br.`rest_id` = hh.`rest_id`";
 
         $qh = $this->con->getQueryHandler($query, array());
         $data = array();
         $i=0;
         while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
-            $data[$res['hotel_id']][$res['field_name']] = $res['hotel_field_norm'];
-            $data[$res['hotel_id']]['hotel_name'] = $res['hotel_name'];
+            $data[$res['hotel_id']][$res['field_name']."$$"."val"] = $res['hotel_field_val'];
+            $data[$res['hotel_id']][$res['field_name']] = $res['hotel_field_norm'];            
+            if(trim(strtolower($res['hotel_name'])) == trim(strtolower($res['rest_name']))) {
+                $data[$res['hotel_id']]['hotel_name'] = $res['hotel_name'];
+            } else {
+                $data[$res['hotel_id']]['hotel_name'] = $res['hotel_name']." - ".$res['rest_name'];
+            }
             $data[$res['hotel_id']]['hotel_id'] = $res['hotel_id'];
         }
 
         return $data;
     }
+    
     
     public function getCuisineFromID($id) {
 
@@ -233,4 +240,86 @@ class Restaurant {
         return $data;
     }
     
+    //AK
+    
+    /**
+     * Get Dinning details based on hotel id
+     */
+    public function getDinningDetails($hotel_id) {
+    
+    	$query = "SELECT dn.* FROM `bb_hotel_dinning` dn, `bb_hotel_dinning_timmings` dq where dn.dinning_id = dq.dinning_id and dq.todays_quota > 0 and dq.hotel_id=:hotel_id";
+    
+    	$qh = $this->con->getQueryHandler($query, array("hotel_id"=>$hotel_id));
+    	$data = array();
+    	while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+    		$data[] = $res;
+    	}
+    
+    	return $data;
+    }
+    
+    
+    /**
+     * Get Dinning quota by date
+     */
+    public function getDinningQuota($hotel_id,$dinning_id, $date) {
+    
+    	begin:
+    	
+    	$query = "SELECT `remaining_quota` FROM `bb_hotel_dinning_quota` WHERE `hotel_id`=:hotel_id and `dinning_id`=:dinning_id and `date`=:date";
+    
+    	$qh = $this->con->getQueryHandler($query, array("hotel_id"=>$hotel_id, "dinning_id"=>$dinning_id, "date"=>$date));
+    	$data = array();
+    	while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+    		$data[] = $res['remaining_quota'];
+    	}
+    	// update the quota in the table for specific date if it is not present. Otherwise Cron Job will do this job.
+    	if(empty($data)){
+    		$newQuery = "SELECT quota from `bb_hotel_dinning_timmings` dq where dq.dinning_id = :dinning_id and dq.hotel_id=:hotel_id";
+    		$newData = $this->con->getQueryHandler($newQuery, array("dinning_id"=>$dinning_id, "hotel_id"=>$hotel_id ));
+    		
+    		while($res = $newData->fetch(PDO::FETCH_ASSOC)) {
+    			$quota= $res['quota'];
+    		}
+    		if(!empty($quota)){
+    			$this->updateQuotaByDate($hotel_id, $dinning_id, $date,$quota);
+    			goto begin;
+    		}else{
+    			$date[0] = " Quota not present in Database!! Try Again Later"; 
+    			goto end;
+    		}
+    	}
+    	
+    	end:
+    	return $data;
+    }
+    
+    /**
+     * Update Quota by date if not done by cron job.
+     */
+    public function updateQuotaByDate($hotel_id, $dinning_id, $date,$quota){
+    	
+    	$query = "INSERT INTO bb_hotel_dinning_quota(hotel_id,dinning_id,date,remaining_quota) VALUES(:hotel_id, :dinning_id, :date, :remaining)";
+    	
+    	$bindParams = array("hotel_id" => $hotel_id,"dinning_id"=> $dinning_id, "date" => $date, "remaining" => $quota);
+    	
+    	$id = $this->con->insertQuery($query, $bindParams);
+    }
+    
+    /**
+     * Get start and end timmings of Dinning
+     */
+    public function getDinningTimmings($hotel_id,$dinning_id) {
+    
+    	$query = "SELECT dq.* FROM `bb_hotel_dinning_timmings` dq where dq.dinning_id =:dinning_id and dq.hotel_id=:hotel_id";
+    
+    	$qh = $this->con->getQueryHandler($query, array("dinning_id"=>$dinning_id, "hotel_id"=>$hotel_id));
+    	$data = array();
+    	while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+    		$data['start'] = $res['start_time'];
+    		$data['end'] = $res['end_time'];
+    	}
+    
+    	 return $data;
+    }
 }

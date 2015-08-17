@@ -40,6 +40,7 @@ if(isset($_POST['form_submit'])) {
     $happy_hours = isset($_POST['happy_hours'])?$_POST['happy_hours']:"";
     $wifi = isset($_POST['wifi'])?$_POST['wifi']:"";
     $airconditioned = isset($_POST['airconditioned'])?$_POST['airconditioned']:"";
+    $booking = isset($_POST['booking'])?$_POST['booking']:"";
     if($happy_hours == "yes") {
         $hh_opening_time = isset($_POST['hh_opening_time'])?$_POST['hh_opening_time']:"";
         $hh_closing_time = isset($_POST['hh_closing_time'])?$_POST['hh_closing_time']:"";
@@ -86,6 +87,7 @@ if(isset($_POST['form_submit'])) {
     $field_id[] = "27";
     $field_id[] = "28";
     $field_id[] = "29";
+    $field_id[] = "30";
     
     $field_val[] = $hotel_name;
     $field_val[] = $rest_desc;
@@ -116,6 +118,7 @@ if(isset($_POST['form_submit'])) {
     $field_val[] = $hh_opening_time;
     $field_val[] = $hh_closing_time;
     $field_val[] = $takeaway;
+    $field_val[] = $booking;
     
     $field_norm[] = $hotel_name;
     $field_norm[] = trim($rest_desc);
@@ -146,6 +149,7 @@ if(isset($_POST['form_submit'])) {
     $field_norm[] = $hh_opening_time;
     $field_norm[] = $hh_closing_time;
     $field_norm[] = $takeaway;
+    $field_norm[] = $booking;
     
     $rest_id = $_POST['hotel_id'];
     $check_hotel = $adminObj->checkHotel($hotel_name);
@@ -520,6 +524,20 @@ if(isset($_POST['form_submit'])) {
                                             <div class="radio">
                                                 <label>
                                                     <input type="radio" name="delivery" id="optionsRadios2" value="no">No
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Booking</label>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="booking" id="optionsRadios1" value="1" checked>Yes
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="booking" id="optionsRadios2" value="0">No
                                                 </label>
                                             </div>
                                         </div>

@@ -7,7 +7,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" style="padding: 0px" href="index.html"><img src="../images/logo.png" /></a>
+                <a class="navbar-brand" style="padding: 0px" href="index.php"><img src="../images/logo.png" /></a>
             </div>
             <!-- /.navbar-header -->
 
@@ -269,6 +269,9 @@
                                 
                                 <li>
                                     <a href="add_sponsored_ads.php"><i class="fa fa-table fa-fw"></i> Add Sponsored Advertisement</a>
+                                </li>
+                                <li>
+                                    <a href="edit_sponsored_ads.php"><i class="fa fa-table fa-fw"></i> Edit Sponsored Advertisement</a>
                                 </li>
                             </ul>
                             <!-- /.nav-second-level -->

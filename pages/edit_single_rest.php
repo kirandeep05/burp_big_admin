@@ -42,6 +42,7 @@ if(isset($_POST['form_submit'])) {
     $happy_hours = isset($_POST['happy_hours'])?$_POST['happy_hours']:"";
     $wifi = isset($_POST['wifi'])?$_POST['wifi']:"";
     $airconditioned = isset($_POST['airconditioned'])?$_POST['airconditioned']:"";
+    $booking = isset($_POST['booking'])?$_POST['booking']:"";
     if($happy_hours == "yes") {
         $hh_opening_time = isset($_POST['hh_opening_time'])?$_POST['hh_opening_time']:"";
         $hh_closing_time = isset($_POST['hh_closing_time'])?$_POST['hh_closing_time']:"";
@@ -87,6 +88,7 @@ if(isset($_POST['form_submit'])) {
     $field_id[] = "27";
     $field_id[] = "28";
     $field_id[] = "29";
+    $field_id[] = "30";
     
     $field_val[] = $hotel_name;
     $field_val[] = trim($rest_desc);
@@ -117,6 +119,7 @@ if(isset($_POST['form_submit'])) {
     $field_val[] = $hh_opening_time;
     $field_val[] = $hh_closing_time;
     $field_val[] = $takeaway;
+    $field_val[] = $booking;
     
     $field_norm[] = $hotel_name;
     $field_norm[] = $rest_desc;
@@ -147,6 +150,7 @@ if(isset($_POST['form_submit'])) {
     $field_norm[] = $hh_opening_time;
     $field_norm[] = $hh_closing_time;
     $field_norm[] = $takeaway;
+    $field_norm[] = $booking;
     //var_dump($field_val);
     
 //    if($rest_name != "") {
@@ -314,7 +318,7 @@ $hotel_name = $rest_name_arr['hotel_name'];
 $rest_name = $rest_name_arr['rest_name'];
 $details = $adminObj->getHotelDetails($hotel_id);
 $seating_arr = array();
-$hh_yes_checked = $ta_yes_checked = $ta_no_checked = $visitor_attraction = $cover_pic_data = $value_for_2 = $zip_code_data = $hh_no_checked = $wifi_yes_checked = $wifi_no_checked = $airconditioned_data = $ac_yes_checked = $ac_no_checked = $hh_opening_time_data = $hh_closing_time_data = $dhaba_checked = $rest_checked = $cafe_checked = $club_checked = $des_checked = $pub_checked = $cas_checked = $fine_checked = $veg_checked = $nonveg_checked = $alcohol_yes = $alcohol_no = $dine_checked = $roof_checked = $lounge_checked = $bar_checked = $rapid_checked = $outdoor_checked = $alacarte_check = $buffet_check = $al_bf_check = $al_lunch_check = $al_dinner_check = $buffet_bf_check = $buffet_lunch_check = $buffet_dinner_check = $banquet_yes_check = $banquet_no_check = $delivery_yes = $delivery_no = "";
+$booking_yes_checked = $booking_no_checked = $hh_yes_checked = $ta_yes_checked = $ta_no_checked = $visitor_attraction = $cover_pic_data = $value_for_2 = $zip_code_data = $hh_no_checked = $wifi_yes_checked = $wifi_no_checked = $airconditioned_data = $ac_yes_checked = $ac_no_checked = $hh_opening_time_data = $hh_closing_time_data = $dhaba_checked = $rest_checked = $cafe_checked = $club_checked = $des_checked = $pub_checked = $cas_checked = $fine_checked = $veg_checked = $nonveg_checked = $alcohol_yes = $alcohol_no = $dine_checked = $roof_checked = $lounge_checked = $bar_checked = $rapid_checked = $outdoor_checked = $alacarte_check = $buffet_check = $al_bf_check = $al_lunch_check = $al_dinner_check = $buffet_bf_check = $buffet_lunch_check = $buffet_dinner_check = $banquet_yes_check = $banquet_no_check = $delivery_yes = $delivery_no = "";
 foreach($details as $detail) {
     if($detail['hotel_field_id'] == 2) {
         $rest_desc = $detail['hotel_field_val'];
@@ -445,6 +449,13 @@ foreach($details as $detail) {
             $ta_yes_checked = "checked";
         } else {
             $ta_no_checked = "checked";
+        }
+    } else if($detail['hotel_field_id'] == 30) {
+        $booking_data = $detail['hotel_field_val'];
+        if($booking_data == "1"){
+            $booking_yes_checked = "checked";
+        } else {
+            $booking_no_checked = "checked";
         }
     }
 } 
@@ -739,6 +750,20 @@ foreach($details as $detail) {
                                             <div class="radio">
                                                 <label>
                                                     <input type="radio" name="delivery" id="optionsRadios2" value="no" <?php echo $delivery_no; ?>>No
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Booking</label>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="booking" id="optionsRadios1" value="1"  <?php echo $booking_yes_checked; ?>>Yes
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="booking" id="optionsRadios2" value="0" <?php echo $booking_no_checked; ?>>No
                                                 </label>
                                             </div>
                                         </div>

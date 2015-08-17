@@ -1,5 +1,6 @@
 <?php
  session_start();
+ include_once '../include/Connection.class.php';
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -8,14 +9,15 @@
 ini_set('display_startup_errors', 1);
 ini_set('display_errors', 1);
 error_reporting(-1);
-
 header('Access-Control-Allow-Origin: *');
 
 function __autoload($classname) {
     include $classname . ".class.php";
 }
+//print_r(get_included_files());
 $restObj = new Restaurant();
 $searchObj = new Search();
+
 $type = $_POST["type"];
 switch ($type) {
     case "quick_search":            
@@ -73,7 +75,7 @@ switch ($type) {
         //var_dump($rest_detail);
         foreach($rest_details as $rest_detail) {
             $data['hotel_name'] = $rest_detail['hotel_name'];
-            $data['cuisines'] = $restObj->getCuisineFromID($rest_detail['Cuisine']);
+            $data['cuisines'] = $restObj->getCuisineFromID($rest_detail['Cuisine$$val']);
             $data['opening_time'] = $rest_detail['Opening Time'];
             $data['closing_time'] = $rest_detail['Closing Time'];
             $data['visitor_attraction'] = $rest_detail['Visitor Attraction'];
@@ -81,6 +83,7 @@ switch ($type) {
             $data['address'] = $rest_detail['Address'];
             $data['main_phone'] = $rest_detail['Main Phone'];        
             $data['alt_phone'] = $rest_detail['Alternate Phone'];
+            $data['seating'] = $rest_detail['Seating'];
             if($rest_detail['Cover Pic'] != "") {
                 $data['cover_pic'] = $url."/admin/images/cover_pic/".$rest_detail['Cover Pic'];
             } else {
@@ -91,10 +94,12 @@ switch ($type) {
             $not_available = array();
             //$check = array($rest_detail['Alcohol'],$rest_detail['Banquet'],$rest_detail['Delivery'],$rest_detail['Take Away'], $rest_detail['Wifi'], $rest_detail['Air Conditioned']);
             foreach($rest_detail as $key => $value) {
-                if(strtolower($value) == "yes") {
-                    $available[] = $key;
-                } else {
-                    $not_availble[] = $key;
+                if(count(explode("$$", $key)) < 0) {
+                    if(strtolower($value) == "yes") {
+                        $available[] = $key;
+                    } else {
+                        $not_availble[] = $key;
+                    }
                 }
             }
             $serves_arr = explode(",",$rest_detail['Serves']);
@@ -117,8 +122,9 @@ switch ($type) {
             $data['menu']['Ala_Carte'] = array();
             $data['menu']['Buffet'] = array();
             $data['menu']['Bar'] = array();
+            $prepend = "";
             foreach($menu_arr as $menu) {
-                if($menu['type_name'] == "A la Carte") {
+                if($menu['type_name'] == "Ala_Carte") {
                     $prepend = $url."/admin/images/alacarte/";
                 } else if ($menu['type_name'] == "Buffet") {
                     $prepend = $url."/admin/images/buffet/";
@@ -233,16 +239,76 @@ switch ($type) {
 
       case "search":
                 $search_value = isset($_POST['search_value'])?$_POST['search_value']:"";
-                $hotel_ids = $searchObj->getHotelIdsFromSearchValues($search_value);
+                $limit = isset($_POST['limit'])?$_POST['limit']:"";
+                $loc = isset($_POST['loc'])?$_POST['loc']:"";
+                $cuisine = isset($_POST['cuisine'])?$_POST['cuisine']:"";
+                $est = isset($_POST['est'])?$_POST['est']:"";
+                $filter = array();
+                if($loc != "")
+                    $filter['6'] = str_replace(",","|",$loc);
+                if($cuisine != "")
+                    $filter['19'] = str_replace(",","|",$cuisine);
+                if($est != "")
+                    $filter['3'] = str_replace(",","|",$est);
+                $hotel_ids = $searchObj->getHotelIdsFromSearchValues($search_value,$limit,$filter);
                 $hotels = array();
                 $log = 0;
                 if (!empty($hotel_ids)){
                  $log = 1;
                  $hotels = $restObj->getSingleRestDetail($hotel_ids);
                 }
-                echo str_replace("\/", "/", json_encode(array("result"=>$hotels,"count"=>count($hotels),"log"=>$log)));
+                $hotels = array_values($hotels);
+                $cuisines = array();
+                $locations = array();
+                $est_type = array();
+                //var_dump($hotels);
+                foreach($hotels as $hotel) {
+                    $locations[] = $hotel['City'];
+                    if(isset($hotel['Cuisine']))
+                        $cuisines = array_merge($cuisines,explode(",",$hotel['Cuisine']));
+                    $est_type = array_merge($est_type,explode(",",$hotel['Type']));
+                }
+                $locations = array_values(array_unique($locations));
+                $cuisines = array_values(array_unique($cuisines));
+                $est_type = array_values(array_unique($est_type));
+                echo str_replace("\/", "/", json_encode(array("result"=>$hotels,"count"=>count($hotels),"filters"=>array("locations"=>$locations,"cusines"=>$cuisines,"est"=>$est_type),"log"=>$log)));
 
             break;
+            
+        // AK
+            case "quota":
+            	$hotel_id = $_POST['hotel'];
+				$dinning_id = $_POST['dinning'];
+				$date = $_POST['date'];
+            	$log = 0;
+            	$quota = $restObj -> getDinningQuota($hotel_id, $dinning_id,$date);
+            	if (!empty($quota)){
+            		$log = 1;
+            		
+            	}else{
+            		
+            	}
+            	//print_r($quota);
+            	echo str_replace("\/", "/", json_encode(array("quota"=>$quota[0],"log"=>$log)));
+            
+            	break;
+          
+            	case "timmings":
+            		$hotel_id = $_POST['hotel'];
+            		$dinning_id = $_POST['dinning'];
+            		
+            		$log = 0;
+            		$quota = $restObj -> getDinningTimmings($hotel_id, $dinning_id);
+            		if (!empty($quota)){
+            			$log = 1;
+            	
+            		}else{
+            	
+            		}
+            		//print_r($quota);
+            		echo str_replace("\/", "/", json_encode(array("start"=>$quota['start'],"end" => $quota['end'],"log"=>$log)));
+            	
+            		break;
     
     default: 
         echo "Default";
