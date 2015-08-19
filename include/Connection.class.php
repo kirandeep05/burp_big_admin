@@ -1,9 +1,4 @@
 <?php
-
-/*
- * Codenomad
- */
-
 /**
  * Description of Connection
  *
@@ -20,13 +15,13 @@ class Connection {
     {
         try {
             $db_host = 'localhost';  //  hostname
-            $db_name = 'burp_big';  //  databasename
-            $db_user = 'root';  //  username
-            $user_pw = '';  //  password
+            $db_name = 'burpblqx_bigburp';  //  databasename
+            $db_user = 'burpblqx_burpbig';  //  username
+            $user_pw = 'Kunal@@@138831138';  //  password
 
             $this->con = new PDO('mysql:host='.$db_host.'; dbname='.$db_name, $db_user, $user_pw);  
             $this->con->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-            $this->con->exec("SET CHARACTER SET utf8mb4");  //  return all sql requests as UTF-8              
+            //$this->con->exec("SET CHARACTER SET utf8mb4");  //  return all sql requests as UTF-8              
         }
         catch (PDOException $err) {  
             echo "Connection fails: The possible reason is: ".

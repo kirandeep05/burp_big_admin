@@ -1,0 +1,120 @@
+<?php
+
+class USER
+{
+	protected $con;
+	protected $user;
+
+
+
+    function __construct() {
+
+
+
+        $this->con = new Connection();
+        $this->user = new USER();
+
+    }
+	public function register($uname,$umail,$upass)
+	{
+		
+		try
+		{
+			$new_password = MD5($upass);
+			
+			$com_code = md5(uniqid(rand()));
+			
+			$user_role = "customer";
+			
+			$query = "INSERT INTO bb_user_login(user_name,user_email,password,com_code,user_role) VALUES(:uname, :umail, :upass, :com_code, :user_role)";
+			
+			$bindParams = array("uname" => $uname,"umail"=> $umail, "upass" => $new_password, "com_code" => $com_code, "user_role" => $user_role);
+												  		
+			$id = $this->con->insertQuery($query, $bindParams);	
+			
+			if($id){
+				$to = $email;
+				
+				$subject = "Confirmation from Burpbig to $username";
+				
+				$header = "Burpbig: Confirmation from TutsforWeb";
+				
+				$message = "Please click the link below to verify and activate your account. rn";
+				
+				$message .= "http://www.burpbig.com/new/confirm.php?passkey=$com_code";
+
+				$sentmail = mail($to,$subject,$message,$header);
+			}
+			
+			return $id;	
+		}
+		catch(PDOException $e)
+		{
+			echo $e->getMessage();
+		}				
+	}
+	
+	public function login($uname,$umail,$upass)
+	{
+		try
+		{
+			$query = "SELECT * FROM bb_user_login WHERE user_name=:uname OR user_email=:umail LIMIT 1";
+			
+			$qh = $this->con->getQueryHandler($query, array("uname"=>$uname,"umail"=>$umail));
+			
+			$userRow=$qh->fetch(PDO::FETCH_ASSOC);
+			
+			if($qh->rowCount() > 0)
+			{
+				if($userRow['password']==MD5($upass))
+				{
+					$_SESSION['user_session'] = $userRow['user_id'];
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+		catch(PDOException $e)
+		{
+			echo $e->getMessage();
+		}
+	}
+	
+	public function is_loggedin()
+	{
+		if(isset($_SESSION['user_session']))
+		{
+			return true;
+		}
+	}
+	
+	public function redirect($url)
+	{
+		header("Location: $url");
+	}
+	public function verify_user($passkey)
+	{
+		try{
+		$query = "UPDATE `bb_user_login` SET `com_code` = :value WHERE `com_code` = :passkey";
+		
+		$bindParams = array("value" => "verified", "passkey" => $passkey);
+		
+		$id = $this->con->insertQuery($query, $bindParams);	
+		
+		return $id;
+		}
+		catch(PDOException $e){
+			echo $e->getMessage();
+		}
+	}
+	public function logout()
+	{
+		session_destroy();
+		unset($_SESSION['user_session']);
+		return true;
+	}
+}
+?>

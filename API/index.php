@@ -1,6 +1,7 @@
 <?php
  session_start();
  include_once '../include/Connection.class.php';
+ include_once '../include/Manager.class.php';
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -15,6 +16,7 @@ function __autoload($classname) {
     include $classname . ".class.php";
 }
 //print_r(get_included_files());
+$managerObj = new Manager();
 $restObj = new Restaurant();
 $searchObj = new Search();
 
@@ -271,7 +273,7 @@ switch ($type) {
                 $locations = array_values(array_unique($locations));
                 $cuisines = array_values(array_unique($cuisines));
                 $est_type = array_values(array_unique($est_type));
-                echo str_replace("\/", "/", json_encode(array("result"=>$hotels,"count"=>count($hotels),"filters"=>array("locations"=>$locations,"cusines"=>$cuisines,"est"=>$est_type),"log"=>$log)));
+                echo str_replace("\/", "/", json_encode(array("result"=>$hotels,"count"=>count($hotels),"filters"=>array("locations"=>$locations,"cuisines"=>$cuisines,"est"=>$est_type),"log"=>$log)));
 
             break;
             
@@ -309,6 +311,26 @@ switch ($type) {
             		echo str_replace("\/", "/", json_encode(array("start"=>$quota['start'],"end" => $quota['end'],"log"=>$log)));
             	
             		break;
+					 case "menu_type":
+        $hotel_id = $_POST['hotel_id'];
+        $menu_type = $managerObj->getHotelMenuType($hotel_id);
+        echo str_replace("\/", "/", json_encode(array("menu_type" => $menu_type)));
+
+        break;
+    case "food_type":
+        $hotel_id = $_POST['hotel_id'];
+        $menu_type_id = $_POST['type_id'];
+        $menu_type = $managerObj->getHotelMenuFood($hotel_id, $menu_type_id);
+        echo str_replace("\/", "/", json_encode(array("food_type" => $menu_type)));
+
+        break;
+    case "get_time_and_members":
+        $hotel_id = $_POST['hotel_id'];
+        $food_type_id = $_POST['food_id'];
+        $menu_type = $managerObj->getHotelavailbility($hotel_id, $food_type_id);
+        echo str_replace("\/", "/", json_encode(array("avail" => $menu_type)));
+
+        break;
     
     default: 
         echo "Default";

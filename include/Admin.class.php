@@ -67,6 +67,19 @@ class Admin {
         return $data;
     }
     
+    public function checkMenuSelection($type_id, $hotel_id) {
+
+        $query = "SELECT COUNT(*) as total FROM `bb_menu_selection` WHERE `type_id` = :type_id AND `hotel_id` = :hotel_id";
+
+        $qh = $this->con->getQueryHandler($query, array("type_id" => $type_id,"hotel_id"=>$hotel_id));
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data = $res;
+        }
+
+        return ($data['total'] > 0)?true:false;
+    }
+    
     
     public function checkRestaurant($name) {
 
@@ -394,6 +407,7 @@ class Admin {
 
         return $id;
     }
+    
     
     public function insertBanquetImage($image_path, $hotel_id) {
 

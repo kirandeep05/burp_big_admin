@@ -1,6 +1,6 @@
 <?php
-error_reporting(-1);
-ini_set('display_errors', 'On');
+//error_reporting(-1);
+//ini_set('display_errors', 'On');
 include '../include/Connection.class.php';
 include '../include/Admin.class.php';
 include './header.php'; 
@@ -301,8 +301,17 @@ if(isset($_POST['form_submit'])) {
                         }
                     }
                 }
-                $adminObj->updateMenuSelection(1, $ala_bf, $ala_lunch, $ala_dinner,$hotel_id);
-                $adminObj->updateMenuSelection(2, $buffet_bf, $buffet_lunch, $buffet_dinner,$hotel_id);
+                
+                if($adminObj->checkMenuSelection(1, $hotel_id)) {
+                    $adminObj->updateMenuSelection(1, $ala_bf, $ala_lunch, $ala_dinner,$hotel_id);
+                } else {
+                    $adminObj->insertMenuSelection(1, $ala_bf, $ala_lunch, $ala_dinner,$hotel_id, '1');
+                }
+                if($adminObj->checkMenuSelection(2, $hotel_id)) {
+                    $adminObj->updateMenuSelection(2, $buffet_bf, $buffet_lunch, $buffet_dinner,$hotel_id);
+                } else {
+                    $adminObj->insertMenuSelection(2, $buffet_bf, $buffet_lunch, $buffet_dinner,$hotel_id, '1');
+                }
                 
            } else {
                $error = "Hotel name exists";
@@ -362,29 +371,29 @@ foreach($details as $detail) {
             if($menu_sel == "alacarte") {
                 $alacarte_check = "checked";
                 $menu_sel_arr_temp = $adminObj->getMenuSelection("1", $hotel_id);
-                if($menu_sel_arr_temp['breakfast'] == "1") {
+                if(isset($menu_sel_arr_temp['breakfast']) && $menu_sel_arr_temp['breakfast'] == "1") {
                     $al_bf_check = "checked";
                 }
-                if($menu_sel_arr_temp['lunch'] == "1") {
+                if(isset($menu_sel_arr_temp['lunch']) && $menu_sel_arr_temp['lunch'] == "1") {
                     $al_lunch_check = "checked";
                 }
                 
-                if($menu_sel_arr_temp['dinner'] == "1") {
+                if(isset($menu_sel_arr_temp['dinner']) && $menu_sel_arr_temp['dinner'] == "1") {
                     $al_dinner_check = "checked";
                 }
                 $script[] = "<script>$(document).ready(function(){ $('#alacarte_check').toggle(); });</script>";
             } else {
                 $buffet_check = "checked";
                 $menu_sel_arr_temp = $adminObj->getMenuSelection("2", $hotel_id);
-                if($menu_sel_arr_temp['breakfast'] == "1") {
+                if(isset($menu_sel_arr_temp['breakfast']) && $menu_sel_arr_temp['breakfast'] == "1") {
                     $buffet_bf_check = "checked";
                 } 
                 
-                if($menu_sel_arr_temp['lunch'] == "1") {
+                if(isset($menu_sel_arr_temp['lunch']) && $menu_sel_arr_temp['lunch'] == "1") {
                     $buffet_lunch_check = "checked";
                 }  
                 
-                if($menu_sel_arr_temp['dinner'] == "1") {
+                if(isset($menu_sel_arr_temp['dinner']) && $menu_sel_arr_temp['dinner'] == "1") {
                     $buffet_dinner_check = "checked";
                 }
                 $script[] = "<script>$(document).ready(function(){ $('#buffet_check').toggle(); });</script>";

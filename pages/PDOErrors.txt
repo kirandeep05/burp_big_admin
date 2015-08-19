@@ -1,7 +1,21 @@
-exception 'PDOException' with message 'SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it.
-' in C:\wamp\www\startbootstrap-sb-admin-2-1.0.7\startbootstrap-sb-admin-2-1.0.7\include\Connection.class.php:27
+exception 'PDOException' with message 'SQLSTATE[28000] [1045] Access denied for user 'root'@'localhost' (using password: NO)' in /home/burpblqx/public_html/admin/include/Connection.class.php:27
 Stack trace:
-#0 C:\wamp\www\startbootstrap-sb-admin-2-1.0.7\startbootstrap-sb-admin-2-1.0.7\include\Connection.class.php(27): PDO->__construct('mysql:host=loca...', 'root', '')
-#1 C:\wamp\www\startbootstrap-sb-admin-2-1.0.7\startbootstrap-sb-admin-2-1.0.7\include\Admin.class.php(15): Connection->__construct()
-#2 C:\wamp\www\startbootstrap-sb-admin-2-1.0.7\startbootstrap-sb-admin-2-1.0.7\pages\login.php(7): Admin->__construct()
+#0 /home/burpblqx/public_html/admin/include/Connection.class.php(27): PDO->__construct('mysql:host=loca...', 'root', '')
+#1 /home/burpblqx/public_html/admin/include/Admin.class.php(15): Connection->__construct()
+#2 /home/burpblqx/public_html/admin/pages/create_restaurant.php(7): Admin->__construct()
+#3 {main}exception 'PDOException' with message 'SQLSTATE[28000] [1045] Access denied for user 'root'@'localhost' (using password: NO)' in /home/burpblqx/public_html/admin/include/Connection.class.php:27
+Stack trace:
+#0 /home/burpblqx/public_html/admin/include/Connection.class.php(27): PDO->__construct('mysql:host=loca...', 'root', '')
+#1 /home/burpblqx/public_html/admin/include/Admin.class.php(15): Connection->__construct()
+#2 /home/burpblqx/public_html/admin/pages/create_restaurant.php(7): Admin->__construct()
+#3 {main}exception 'PDOException' with message 'SQLSTATE[28000] [1045] Access denied for user 'burpblqx_bigburp'@'localhost' (using password: YES)' in /home/burpblqx/public_html/admin/include/Connection.class.php:27
+Stack trace:
+#0 /home/burpblqx/public_html/admin/include/Connection.class.php(27): PDO->__construct('mysql:host=loca...', 'burpblqx_bigbur...', '#fn{_fgPeUhV')
+#1 /home/burpblqx/public_html/admin/include/Admin.class.php(15): Connection->__construct()
+#2 /home/burpblqx/public_html/admin/pages/create_restaurant.php(7): Admin->__construct()
+#3 {main}exception 'PDOException' with message 'SQLSTATE[42000]: Syntax error or access violation: 1115 Unknown character set: 'utf8mb4'' in /home/burpblqx/public_html/admin/include/Connection.class.php:29
+Stack trace:
+#0 /home/burpblqx/public_html/admin/include/Connection.class.php(29): PDO->exec('SET CHARACTER S...')
+#1 /home/burpblqx/public_html/admin/include/Admin.class.php(15): Connection->__construct()
+#2 /home/burpblqx/public_html/admin/pages/create_restaurant.php(7): Admin->__construct()
 #3 {main}
