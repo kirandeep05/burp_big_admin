@@ -77,7 +77,30 @@ and open the template in the editor.
                         <tr><td><input type="hidden" name="type" value="search" /><input type="submit" value="Get" /></td></tr>
                     </table>
                 </fieldset>
-                </form>
+         </form>
+        
+        <form action="index.php" method="post">
+                <fieldset>
+                    <legend>Filter</legend>
+                    <table>
+                        <tr><td>Hotel Id's</td><td><input type="text" name="hotel_ids" /></td></tr>
+                        <tr><td>Location</td><td><input type="text" name="loc" /></td></tr>
+                        <tr><td>Establishment</td><td><input type="text" name="est" /></td></tr>
+                        <tr><td>Cuisine</td><td><input type="text" name="cuisine" /></td></tr>
+                        <tr><td><input type="hidden" name="type" value="filter" /><input type="submit" value="Get" /></td></tr>
+                    </table>
+                </fieldset>
+        </form>
+        
+        <form action="index.php" method="post">
+                <fieldset>
+                    <legend>Menu</legend>
+                    <table>
+                        <tr><td>Hotel Id</td><td><input type="text" name="hotel_id" /></td></tr>                        
+                        <tr><td><input type="hidden" name="type" value="menu" /><input type="submit" value="Get" /></td></tr>
+                    </table>
+                </fieldset>
+        </form>
         
     </body>
 </html>

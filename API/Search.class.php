@@ -17,7 +17,7 @@ class Search {
         $this->con = new Connection();
     }
 
-    public function getHotelIdsFromSearchValues($search_value,$limit = "",$filter = array()) {
+    public function getHotelIdsFromSearchValues($search_value,$limit = "") {
 
         $searchArray = explode(" ",$search_value);
         $countSearchArray = count($searchArray);
@@ -37,18 +37,8 @@ class Search {
         if($limit != "") {
             $limit_query = " LIMIT ".$limit;
         }
-        $filter_val = (empty($filter))?"":" AND ";  
-        $filter_arr = array();
-        if(!empty($filter)) {
-            foreach($filter as $key=>$val) {
-                $filter_arr[] = " (hotel_field_id = $key AND hotel_field_norm REGEXP '$val')";
-            }
-            $filter_val .= implode(" AND ", $filter_arr);
-            $query = "SELECT DISTINCT(`hotel_id`) FROM `bb_hotel_details` WHERE `hotel_id` IN ("
-                    . "SELECT DISTINCT(`hotel_id`) FROM `bb_hotel_details` WHERE ".$bindParams.")".$filter_val;
-        } else {
-            $query = "SELECT DISTINCT(`hotel_id`) FROM `bb_hotel_details` WHERE ".$bindParams.$limit_query ;        
-        }
+        
+        $query = "SELECT DISTINCT(`hotel_id`) FROM `bb_hotel_details` WHERE ".$bindParams.$limit_query ;        
                         
         $qh = $this->con->getQueryHandler($query, array());
         $data = array();
@@ -58,6 +48,56 @@ class Search {
         $hotel_ids = implode(",",$data);
         return $data;
     }
+    
+    public function getFilterResults($hotel_ids,$filter) { 
+        foreach($filter as $key=>$value) {
+            if(!empty($hotel_ids)) {
+                if($key == "21") {
+                    $hotel_ids = $this->getHotelIdsFromPriceFilter($key,$value,$hotel_ids);
+                } else {
+                    $hotel_ids = $this->getHotelIdsFromFilter($key,$value,$hotel_ids);
+                }
+                //var_dump($hotel_ids);
+            }
+        }
+        return $hotel_ids;
+     }
+    
+     public function getHotelIdsFromFilter($key,$val,$hotel_ids) {
+        //var_dump($hotel_ids);
+        $query = "SELECT DISTINCT(`hotel_id`) FROM `bb_hotel_details` WHERE (hotel_field_id = $key AND hotel_field_norm REGEXP '$val') AND `hotel_id` IN (".implode(",",$hotel_ids).")" ;
+        $qh = $this->con->getQueryHandler($query, array());
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res['hotel_id'];
+        }        
+        return $data; 
+     }
+     
+     public function getHotelIdsFromPriceFilter($key,$val,$hotel_ids) {
+        $price = explode("-", $val);
+        $low = $price[0];
+        $high = $price[1];
+        if($low != "" && $high != "") {
+            $query = "SELECT DISTINCT(`hotel_id`) FROM `bb_hotel_details` "
+                . "WHERE (hotel_field_id = $key AND (hotel_field_norm > $low AND hotel_field_norm < $high)) AND "
+                . "`hotel_id` IN (".implode(",",$hotel_ids).")" ;
+        } else if($low == "" && $high != "") {
+            $query = "SELECT DISTINCT(`hotel_id`) FROM `bb_hotel_details` "
+                . "WHERE (hotel_field_id = $key AND (hotel_field_norm < $high)) AND "
+                . "`hotel_id` IN (".implode(",",$hotel_ids).")" ;
+        } else if($low != "" && $high == "") {
+            $query = "SELECT DISTINCT(`hotel_id`) FROM `bb_hotel_details` "
+                . "WHERE (hotel_field_id = $key AND (hotel_field_norm > $low)) AND "
+                . "`hotel_id` IN (".implode(",",$hotel_ids).")" ;
+        }
+        $qh = $this->con->getQueryHandler($query, array());
+        $data = array();
+        while($res = $qh->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $res['hotel_id'];
+        }        
+        return $data; 
+     }
     
     public function getSearchSuggestions($search_value) {
 
